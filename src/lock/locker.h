@@ -33,19 +33,53 @@ private:
 class locker{
 public:
     locker(){
-
+        if(pthread_mutex_init(&mMutex,NULL) != 0){
+            throw std::exception();
+        }
     }
     ~locker(){
-
+        if(pthread_mutex_destroy(&mMutex) != 0){
+            //throw std::exception();
+        }
     }
 public:
     bool lock(){
-
+        return pthread_mutex_lock(&mMutex) == 0;
     }
     bool unLock(){
-        
+        return pthread_mutex_unlock(&mMutex) == 0;
     }
+    pthread_mutex_t* getMutex(){
+        return &mMutex;
+    }
+private:
+    pthread_mutex_t mMutex;
 };
-class pond{
-
+class cond{
+public:
+    cond(){
+        if(pthread_cond_init(&mCond,NULL) != 0){
+            throw std::exception();
+        }
+    }
+    ~cond(){
+        pthread_cond_destroy(&mCond);
+    }
+public:
+    bool wait(pthread_mutex_t* mMutex){
+        return pthread_cond_wait(&mCond,mMutex) == 0;
+    }
+    bool timewait(pthread_mutex_t* mMutex,struct timespec t){
+        int ret = 0;
+        ret = pthread_cond_timedwait(&mCond,mMutex,&t);
+        return ret == 0;
+    }
+    bool signal(){
+        return pthread_cond_signal(&mCond);
+    }
+    bool broadcast(){
+        return pthread_cond_broadcast(&mCond);
+    }
+private:
+    pthread_cond_t mCond;
 };
