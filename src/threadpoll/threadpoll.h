@@ -54,17 +54,74 @@ threadPool<T>::~threadPool(){
 template<typename T>
 bool threadPool<T>::append(T* request,int state){
     mQueueLocker.lock();
-    if(mWordQueue)
+    if(mWordQueue.size() >= mMaxRequests){
+        mQueueLocker.unLock();
+        return false;
+    }
+    request -> mState = state;
+    mWorkQueue.push_back(request);
+    mQueueLocker.unLock();
+    mQueueStat.post();
+    return true;
 }
 template<typename T>
 bool threadPool<T>::appendP(T* request){
-
+    mQueueLocker.lock();
+    if(mWorkQueue.size() >= mMaxRequests){
+        mQueueLocker.unLock();
+        return false;
+    }
+    mWorkQueue.push_back(request);
+    mQueueLocker.unLock();
+    mQueuestat.post();
+    return true;
 }
 template<typename T>
 void* threadPool<T>::worker(void* arg){
-
+    threadPool * pool = (threadPool*)arg;
+    pool -> run();
+    return pool;
 }
 template<typename T>
 void threadPool<T>::run(){
-
+    while(true){
+        mQueueStat.wait();
+        mQueueLocker.lock();
+        if(mWorkQueue.empty()){
+            mQueueLocker.unLock();
+            continue;
+        }
+        T* request = mWorkQueue.front();
+        mWorkQueue.pop_front();
+        mQueueLocker.unLock();
+        if(!request){
+            continue;
+        }
+        if(mActorModel == 1){
+            if(request -> mState == 0){
+                if(request -> readOnce()){
+                    request -> improv = 1;
+                    connectionRAII mysqlcon(&request->mysql,mConnPool);
+                    request -> process();
+                }
+                else{
+                    request -> improv = 1;
+                    request -> timerFlag = 1;
+                }
+            }
+        }
+        else{
+            if(request -> write()){
+                request -> improv = 1;
+            }
+            else{
+                request -> improv = 1;
+                request -> timerFlag = 1;
+            }
+        }
+    }
+    else{
+        connectionRAII mysqlConn(&request -> mysql,mConnPool);
+        request -> process();
+    }
 }
