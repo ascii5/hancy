@@ -52,19 +52,62 @@ void sortTimerList::addTimer(utilTimer* timer,utilTimer* listHead){
     }
 }
 void sortTimerList::adjustTimer(utilTimer* timer){
-
+    if(!timer){
+        return ;
+    }
+    utilTimer* tmp = timer -> next;
+    if(!tmp || (timer -> expire < tmp -> expire)){
+        return ;
+    }
+    if(timer == head){
+        head = head -> next;
+        head -> prev = NULL;
+        timer -> next = NULL;
+        addTimer(timer,head);
+    }
+    else{
+        timer -> prev -> next = timer -> next;
+        timer -> next -> prev = timer -> prev;
+        addTimer(timer,timer->next);
+    }
 }
 void sortTimerList::delTimer(utilTimer* timer){
-
+    if(!timer){
+        return ;
+    }
+    if((timer == head) && (timer == tail)){
+        delete timer;
+        head = NULL;
+        tail = NULL;
+        return ;
+    }
+    if(timer == head){
+        head = head -> next;
+        head -> prev = NULL;
+        delete timer;
+        return ;
+    }
+    if(timer == tail){
+        tail = tail -> prev;
+        tail -> next = NULL;
+        delete timer;
+        return ;
+    }
+    timer -> prev -> next = timer -> next;
+    timer -> next -> prev = timer -> prev;
+    delete timer;
 }
 void sortTimerList::tick(){
-
+    
 }
 void utils::init(int timeSlot){
     mTIMESLOT = timeSlot;
 }
 int utils::setNonBlocking(int fd){
-    int oldOption = fcntl(fd,F_GETF)
+    int oldOption = fcntl(fd,F_GETFL);
+    int newOption = oldOption | O_NONBLOCK;
+    fcntl(fd,F_SETFL,newOption);
+    return oldOption;
 }
 void utils::addfd(int epollfd,int fd,bool oneShot,int TRIGMode){
 
