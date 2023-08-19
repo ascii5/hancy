@@ -57,5 +57,22 @@ void removefd(int epollfd,int fd){
 }
 //将此事件重置为EPOLLONESHOT
 void modfd(int epollfd,int fd,int ev,int TRIGMode){
+    epoll_event event;
+    event.data.fd = fd;
 
+    if(TRIGMode == 1)
+        event.events = ev | EPOLLET | EPOLLONESHOT | EPOLLRDHUP;
+    else
+        event.events = ev | EPOLLRDHUP | EPOLLONESHOT;
+    epoll_ctl(epollfd,EPOLL_CTL_MOD,fd,&event);
+}
+int httpConn::mUserCount = 0;
+int httpConn::mEpollfd = -1;
+void httpConn::closeConn(bool realClose){
+    if(realClose && (mSockfd != -1)){
+        printf("close %d\n",mSockfd);
+        removefd(mEpollfd,mSockfd);
+        mSockfd = -1;
+        mUserCount--;
+    }
 }
