@@ -122,6 +122,89 @@ httpConn::LINE_STATUS httpConn::parseLine(){
     char temp;
     for(;mCheckedIdx < mReadIdx;++mCheckedIdx){
         temp = mReadBUF[mCheckedIdx];
-        if(temp == '\r')
+        if(temp == '\r'){
+            if((mCheckedIdx + 1 == mReadIdx))
+                return LINE_OPEN;
+            else if(mReadBUF[mCheckedIdx + 1] == '\n'){
+                mReadBUF[mCheckedIdx++] = '\0';
+                mReadBUF[mCheckedIdx++] = '\0';
+                return LINE_OK;
+            }
+            return LINE_BAD;
+        }
+        else if(temp == '\n'){
+            if(mCheckedIdx > 1 && mReadBUF[mCheckedIdx - 1] == '\r'){
+                mReadBUF[mCheckedIdx-1] = '\0';
+                mReadBUF[mCheckedIdx++] = '\0';
+                return LINE_OK;
+            }
+            return LINE_BAD;
+        }
     }
+    return LINE_OPEN;
+}
+bool httpConn::readOnce(){
+    if(mReadIdx >= READ_BUFFER_SIZE)
+        return false;
+    int bytesRead = 0;
+    //LT读数据
+    if(mTRIGMode == 0){
+        bytesRead = recv(mSockfd,mReadBUF + mReadIdx,READ_BUFFER_SIZE - mReadIdx,0);
+        mReadIdx += bytesRead;
+
+        if(bytesRead <= 0)
+            return false;
+        return true;
+    }
+    //ET读数据
+    else{
+        while(true){
+            bytesRead = recv(mSockfd,mReadBUF + mReadIdx,READ_BUFFER_SIZE - mReadIdx,0);
+            if(bytesRead == -1){
+                if(errno == EAGAIN | errno == EWOULDBLOCK){
+                    break;
+                }
+                else
+                    return false;
+            }
+            else if(bytesRead == 0)
+                return false;
+            mReadIdx += bytesRead;
+        }
+        return true;
+    }
+}
+httpConn::HTTP_CODE httpConn::parseRequestLine(char* text){
+    mUrl = strpbrk(text," \t");
+    if(!mUrl)
+        return BAD_REQUEST;
+    *mUrl++ = '\0';
+    char* method = text;
+    if(strcasecmp(method,"GET") == 0)
+        mMethod = GET;
+    else if(strcasecmp(method,"POST") == 0)
+    {
+        mMethod = POST;
+        cgi = 1;
+    }    
+    else
+        return BAD_REQUEST;
+    mUrl += strspn(mUrl," \t");
+    mVersion = strpbrk(mUrl," \t");
+    if(!mVersion)
+        return BAD_REQUEST;
+    *mVersion++ = '\0';
+    mVersion += strspn(mVersion," \t");
+    if(strcasecmp(mVersion,"HTTP/1.1") != 0)
+        return BAD_REQUEST;
+    if(strncasecmp(mUrl,"http://",7) == 0){
+        mUrl += 7;
+        mUrl = strchr(mUrl,'/');
+    }
+    if(!mUrl || mUrl[0] != '/')
+        return BAD_REQUEST;
+    if(strlen(mUrl) == 1)
+        strcat(mUrl,"judge.html");
+    mCheckState = CHECK_STATE_HEADER;
+    return NO_REQUEST;
 }
