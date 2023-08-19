@@ -134,5 +134,5 @@ private:
 
     char sqlUser[100];
     char sqlPasswd[100];
-    char sqlname[100];
+    char sqlName[100];
 };

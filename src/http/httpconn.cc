@@ -76,3 +76,52 @@ void httpConn::closeConn(bool realClose){
         mUserCount--;
     }
 }
+void httpConn::init(int sockfd,const sockaddr_in &addr,char* root,int TRIGMode,int closeLog,std::string user,std::string passwd,std::string sqlname){
+    mSockfd = sockfd;
+    mAddress = addr;
+
+    addfd(mEpollfd,sockfd,true,mTRIGMode);
+    mUserCount++;
+    
+    docRoot = root;
+    mTRIGMode = TRIGMode;
+    mCloseLog = closeLog;
+    strcpy(sqlUser,user.c_str());
+    strcpy(sqlPasswd,passwd.c_str());
+    strcpy(sqlName,sqlname.c_str());
+    
+    init();
+}
+void httpConn::init(){
+    mysql = NULL;
+    bytesToSend = 0;
+    bytesHaveSend = 0;
+    mCheckState = CHECK_STATE_REQUESTLINE;
+    mLinger = false;
+    mMethod = GET;
+    mUrl = 0;
+    mVersion = 0;
+    mContentLength = 0;
+    mHost = 0;
+    mStartLine = 0;
+    mCheckedIdx = 0;
+    mReadIdx = 0;
+    mWriteIdx = 0;
+    cgi = 0;
+    mState = 0;
+    timerFlag = 0;
+    improv = 0;
+
+    memset(mReadBUF,'\0',READ_BUFFER_SIZE);
+    memset(mWriteBUf,'\0',WRITE_BUFFER_SIZE);
+    memset(mRealFile,'\0',FILENAME_LEN);
+}
+
+//从状态机
+httpConn::LINE_STATUS httpConn::parseLine(){
+    char temp;
+    for(;mCheckedIdx < mReadIdx;++mCheckedIdx){
+        temp = mReadBUF[mCheckedIdx];
+        if(temp == '\r')
+    }
+}
