@@ -65,7 +65,7 @@ public:
     httpConn(){};
     ~httpConn(){};
 public:
-    void init(int sockfd,const sockaddr_in &addr,char*,int,int, std::srting user,std::string passwd,std::string sqlName);
+    void init(int sockfd,const sockaddr_in &addr,char*,int,int, std::string user,std::string passwd,std::string sqlName);
     void closeConn(bool realClose = true);
     void process();
     bool readOnce();
@@ -109,5 +109,30 @@ private:
     int mStartLine;
     char mWriteBUf[WRITE_BUFFER_SIZE];
     int mWriteIdx;
-    CHECK_STATE m_check_state
+    CHECK_STATE mCheckState;
+    METHOD mMethod;
+    char mRealFile[FILENAME_LEN];
+    char* mUrl;
+    char* mVersion;
+    char* mHost;
+    long mContentLength;
+    bool mLinger;
+    char* mFileAddress;
+    
+    struct stat mFileStat;
+    struct iovec mIv[2];
+    int mIvCount;
+    int cgi;
+    char* mString;
+    int bytesToSend;
+    int bytesHaveSend;
+    char* docRoot;
+    
+    std::map<std::string,std::string> mUsers;
+    int mTRIGMode;
+    int mCloseLog;
+
+    char sqlUser[100];
+    char sqlPasswd[100];
+    char sqlname[100];
 };
