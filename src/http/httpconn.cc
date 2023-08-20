@@ -208,3 +208,33 @@ httpConn::HTTP_CODE httpConn::parseRequestLine(char* text){
     mCheckState = CHECK_STATE_HEADER;
     return NO_REQUEST;
 }
+httpConn::HTTP_CODE httpConn::parseHeaders(char* text){
+    if(text[0] == '\0'){
+        if(mContentLength != 0){
+            mCheckState = CHECK_STATE_CONTENT;
+            return NO_REQUEST;
+        }
+        return  GET_REQUEST;
+    }
+    else if(strncasecmp(text,"Connection:",11) == 0){
+        text += 11;
+        text += strspn(text," \t");
+        if(strcasecmp(text,"keep-alive") == 0){
+            mLinger = true;
+        }
+    }
+    else if(strncasecmp(text,"Content-length:",15) == 0){
+        text += 15;
+        text += strspn(text," \t");
+        mContentLength = atol(text);
+    }
+    else if(strncasecmp(text,"Host:",5) == 0){
+        text += 5;
+        text += strspn(text," \t");
+        mHost = text;
+    }
+    else{
+        LOG_INFO("oop!unknow header:%s",text);
+    }
+    return NO_REQUEST;
+}
