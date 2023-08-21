@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/usr/bin/mysql
+CXX_INCLUDES = -I/usr/include/mysql/mysql.h
 
 CXX_FLAGS = -std=gnu++11
 
