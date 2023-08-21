@@ -238,6 +238,7 @@ httpConn::HTTP_CODE httpConn::parseHeaders(char* text){
     }
     return NO_REQUEST;
 }
+//判断http请求是否被完全读入
 httpConn::HTTP_CODE httpConn::parseContent(char* text){
     if(mReadIdx >= (mContentLength + mCheckedIdx)){
         text[mContentLength] = '\0';
@@ -245,4 +246,47 @@ httpConn::HTTP_CODE httpConn::parseContent(char* text){
         return GET_REQUEST;
     }
     return NO_REQUEST;
+}
+httpConn::HTTP_CODE httpConn::processRead(){
+    LINE_STATUS line_status = LINE_OK;
+    HTTP_CODE ret = NO_REQUEST;
+    char* text = 0;
+
+    while((mCheckState == CHECK_STATE_CONTENT && line_status == LINE_OK) || (line_status = parseLine()) == LINE_OK){
+        text = getLine();
+        mStartLine = mCheckedIdx;
+        LOG_INFO("%s",text);
+
+        switch(mCheckState){
+            case CHECK_STATE_REQUESTLINE:
+            {
+                ret = parseRequestLine(text);
+                if(ret == BAD_REQUEST)
+                    return BAD_REQUEST;
+                break;
+            }    
+            case CHECK_STATE_HEADER:
+                {
+                    ret = parseHeaders(text);
+                    if(ret == BAD_REQUEST)
+                        return BAD_REQUEST;
+                    else if(ret == GET_REQUEST)
+                        return doRequest();
+                    break;
+                }
+                
+            case CHECK_STATE_CONTENT:
+            {
+                ret = parseContent(text);
+                if(ret == GET_REQUEST)
+                    return doRequest();
+                line_status = LINE_OPEN;
+                break;
+            }
+            default:
+                return INTERNAL_ERROR;
+        }
+        return NO_REQUEST;
+
+    }
 }
