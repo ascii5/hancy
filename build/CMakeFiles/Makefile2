@@ -79,6 +79,7 @@ clean: bin/clean
 
 # Recursive "all" directory target.
 bin/all: bin/CMakeFiles/server.dir/all
+bin/all: bin/CMakeFiles/serverlib.dir/all
 .PHONY : bin/all
 
 # Recursive "preinstall" directory target.
@@ -87,13 +88,14 @@ bin/preinstall:
 
 # Recursive "clean" directory target.
 bin/clean: bin/CMakeFiles/server.dir/clean
+bin/clean: bin/CMakeFiles/serverlib.dir/clean
 .PHONY : bin/clean
 
 #=============================================================================
 # Target rules for target bin/CMakeFiles/server.dir
 
 # All Build rule for target.
-bin/CMakeFiles/server.dir/all:
+bin/CMakeFiles/server.dir/all: bin/CMakeFiles/serverlib.dir/all
 	$(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/depend
 	$(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/chenranran/Program/hancy/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8 "Built target server"
@@ -101,7 +103,7 @@ bin/CMakeFiles/server.dir/all:
 
 # Build rule for subdir invocation for target.
 bin/CMakeFiles/server.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/chenranran/Program/hancy/build/CMakeFiles 8
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/chenranran/Program/hancy/build/CMakeFiles 15
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 bin/CMakeFiles/server.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/chenranran/Program/hancy/build/CMakeFiles 0
 .PHONY : bin/CMakeFiles/server.dir/rule
@@ -114,6 +116,32 @@ server: bin/CMakeFiles/server.dir/rule
 bin/CMakeFiles/server.dir/clean:
 	$(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/clean
 .PHONY : bin/CMakeFiles/server.dir/clean
+
+#=============================================================================
+# Target rules for target bin/CMakeFiles/serverlib.dir
+
+# All Build rule for target.
+bin/CMakeFiles/serverlib.dir/all:
+	$(MAKE) $(MAKESILENT) -f bin/CMakeFiles/serverlib.dir/build.make bin/CMakeFiles/serverlib.dir/depend
+	$(MAKE) $(MAKESILENT) -f bin/CMakeFiles/serverlib.dir/build.make bin/CMakeFiles/serverlib.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/chenranran/Program/hancy/build/CMakeFiles --progress-num=9,10,11,12,13,14,15 "Built target serverlib"
+.PHONY : bin/CMakeFiles/serverlib.dir/all
+
+# Build rule for subdir invocation for target.
+bin/CMakeFiles/serverlib.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/chenranran/Program/hancy/build/CMakeFiles 7
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 bin/CMakeFiles/serverlib.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/chenranran/Program/hancy/build/CMakeFiles 0
+.PHONY : bin/CMakeFiles/serverlib.dir/rule
+
+# Convenience name for target.
+serverlib: bin/CMakeFiles/serverlib.dir/rule
+.PHONY : serverlib
+
+# clean rule for target.
+bin/CMakeFiles/serverlib.dir/clean:
+	$(MAKE) $(MAKESILENT) -f bin/CMakeFiles/serverlib.dir/build.make bin/CMakeFiles/serverlib.dir/clean
+.PHONY : bin/CMakeFiles/serverlib.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

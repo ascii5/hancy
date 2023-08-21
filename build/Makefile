@@ -129,6 +129,19 @@ server/fast:
 	$(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/build
 .PHONY : server/fast
 
+#=============================================================================
+# Target rules for targets named serverlib
+
+# Build rule for target.
+serverlib: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 serverlib
+.PHONY : serverlib
+
+# fast build rule for target.
+serverlib/fast:
+	$(MAKE) $(MAKESILENT) -f bin/CMakeFiles/serverlib.dir/build.make bin/CMakeFiles/serverlib.dir/build
+.PHONY : serverlib/fast
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -138,6 +151,7 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... server"
+	@echo "... serverlib"
 .PHONY : help
 
 

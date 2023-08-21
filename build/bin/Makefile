@@ -130,110 +130,205 @@ server/fast:
 	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/build
 .PHONY : server/fast
 
-# target to build an object file
-CGImysql/sql_connection_pool.o:
-	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/CGImysql/sql_connection_pool.o
+# Convenience name for target.
+bin/CMakeFiles/serverlib.dir/rule:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 bin/CMakeFiles/serverlib.dir/rule
+.PHONY : bin/CMakeFiles/serverlib.dir/rule
+
+# Convenience name for target.
+serverlib: bin/CMakeFiles/serverlib.dir/rule
+.PHONY : serverlib
+
+# fast build rule for target.
+serverlib/fast:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/serverlib.dir/build.make bin/CMakeFiles/serverlib.dir/build
+.PHONY : serverlib/fast
+
+CGImysql/sql_connection_pool.o: CGImysql/sql_connection_pool.cpp.o
 .PHONY : CGImysql/sql_connection_pool.o
 
-# target to preprocess a source file
-CGImysql/sql_connection_pool.i:
-	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/CGImysql/sql_connection_pool.i
+# target to build an object file
+CGImysql/sql_connection_pool.cpp.o:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/CGImysql/sql_connection_pool.cpp.o
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/serverlib.dir/build.make bin/CMakeFiles/serverlib.dir/CGImysql/sql_connection_pool.cpp.o
+.PHONY : CGImysql/sql_connection_pool.cpp.o
+
+CGImysql/sql_connection_pool.i: CGImysql/sql_connection_pool.cpp.i
 .PHONY : CGImysql/sql_connection_pool.i
 
-# target to generate assembly for a file
-CGImysql/sql_connection_pool.s:
-	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/CGImysql/sql_connection_pool.s
+# target to preprocess a source file
+CGImysql/sql_connection_pool.cpp.i:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/CGImysql/sql_connection_pool.cpp.i
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/serverlib.dir/build.make bin/CMakeFiles/serverlib.dir/CGImysql/sql_connection_pool.cpp.i
+.PHONY : CGImysql/sql_connection_pool.cpp.i
+
+CGImysql/sql_connection_pool.s: CGImysql/sql_connection_pool.cpp.s
 .PHONY : CGImysql/sql_connection_pool.s
 
-# target to build an object file
-config/config.o:
-	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/config/config.o
+# target to generate assembly for a file
+CGImysql/sql_connection_pool.cpp.s:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/CGImysql/sql_connection_pool.cpp.s
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/serverlib.dir/build.make bin/CMakeFiles/serverlib.dir/CGImysql/sql_connection_pool.cpp.s
+.PHONY : CGImysql/sql_connection_pool.cpp.s
+
+config/config.o: config/config.cpp.o
 .PHONY : config/config.o
 
-# target to preprocess a source file
-config/config.i:
-	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/config/config.i
+# target to build an object file
+config/config.cpp.o:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/config/config.cpp.o
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/serverlib.dir/build.make bin/CMakeFiles/serverlib.dir/config/config.cpp.o
+.PHONY : config/config.cpp.o
+
+config/config.i: config/config.cpp.i
 .PHONY : config/config.i
 
-# target to generate assembly for a file
-config/config.s:
-	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/config/config.s
+# target to preprocess a source file
+config/config.cpp.i:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/config/config.cpp.i
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/serverlib.dir/build.make bin/CMakeFiles/serverlib.dir/config/config.cpp.i
+.PHONY : config/config.cpp.i
+
+config/config.s: config/config.cpp.s
 .PHONY : config/config.s
 
-# target to build an object file
-http/http_conn.o:
-	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/http/http_conn.o
+# target to generate assembly for a file
+config/config.cpp.s:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/config/config.cpp.s
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/serverlib.dir/build.make bin/CMakeFiles/serverlib.dir/config/config.cpp.s
+.PHONY : config/config.cpp.s
+
+http/http_conn.o: http/http_conn.cpp.o
 .PHONY : http/http_conn.o
 
-# target to preprocess a source file
-http/http_conn.i:
-	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/http/http_conn.i
+# target to build an object file
+http/http_conn.cpp.o:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/http/http_conn.cpp.o
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/serverlib.dir/build.make bin/CMakeFiles/serverlib.dir/http/http_conn.cpp.o
+.PHONY : http/http_conn.cpp.o
+
+http/http_conn.i: http/http_conn.cpp.i
 .PHONY : http/http_conn.i
 
-# target to generate assembly for a file
-http/http_conn.s:
-	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/http/http_conn.s
+# target to preprocess a source file
+http/http_conn.cpp.i:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/http/http_conn.cpp.i
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/serverlib.dir/build.make bin/CMakeFiles/serverlib.dir/http/http_conn.cpp.i
+.PHONY : http/http_conn.cpp.i
+
+http/http_conn.s: http/http_conn.cpp.s
 .PHONY : http/http_conn.s
 
-# target to build an object file
-log/log.o:
-	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/log/log.o
+# target to generate assembly for a file
+http/http_conn.cpp.s:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/http/http_conn.cpp.s
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/serverlib.dir/build.make bin/CMakeFiles/serverlib.dir/http/http_conn.cpp.s
+.PHONY : http/http_conn.cpp.s
+
+log/log.o: log/log.cpp.o
 .PHONY : log/log.o
 
-# target to preprocess a source file
-log/log.i:
-	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/log/log.i
+# target to build an object file
+log/log.cpp.o:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/log/log.cpp.o
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/serverlib.dir/build.make bin/CMakeFiles/serverlib.dir/log/log.cpp.o
+.PHONY : log/log.cpp.o
+
+log/log.i: log/log.cpp.i
 .PHONY : log/log.i
 
-# target to generate assembly for a file
-log/log.s:
-	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/log/log.s
+# target to preprocess a source file
+log/log.cpp.i:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/log/log.cpp.i
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/serverlib.dir/build.make bin/CMakeFiles/serverlib.dir/log/log.cpp.i
+.PHONY : log/log.cpp.i
+
+log/log.s: log/log.cpp.s
 .PHONY : log/log.s
 
-# target to build an object file
-main.o:
-	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/main.o
+# target to generate assembly for a file
+log/log.cpp.s:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/log/log.cpp.s
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/serverlib.dir/build.make bin/CMakeFiles/serverlib.dir/log/log.cpp.s
+.PHONY : log/log.cpp.s
+
+main.o: main.cpp.o
 .PHONY : main.o
 
-# target to preprocess a source file
-main.i:
-	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/main.i
+# target to build an object file
+main.cpp.o:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/main.cpp.o
+.PHONY : main.cpp.o
+
+main.i: main.cpp.i
 .PHONY : main.i
 
-# target to generate assembly for a file
-main.s:
-	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/main.s
+# target to preprocess a source file
+main.cpp.i:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/main.cpp.i
+.PHONY : main.cpp.i
+
+main.s: main.cpp.s
 .PHONY : main.s
 
-# target to build an object file
-timer/lst_timer.o:
-	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/timer/lst_timer.o
+# target to generate assembly for a file
+main.cpp.s:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/main.cpp.s
+.PHONY : main.cpp.s
+
+timer/lst_timer.o: timer/lst_timer.cpp.o
 .PHONY : timer/lst_timer.o
 
-# target to preprocess a source file
-timer/lst_timer.i:
-	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/timer/lst_timer.i
+# target to build an object file
+timer/lst_timer.cpp.o:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/timer/lst_timer.cpp.o
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/serverlib.dir/build.make bin/CMakeFiles/serverlib.dir/timer/lst_timer.cpp.o
+.PHONY : timer/lst_timer.cpp.o
+
+timer/lst_timer.i: timer/lst_timer.cpp.i
 .PHONY : timer/lst_timer.i
 
-# target to generate assembly for a file
-timer/lst_timer.s:
-	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/timer/lst_timer.s
+# target to preprocess a source file
+timer/lst_timer.cpp.i:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/timer/lst_timer.cpp.i
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/serverlib.dir/build.make bin/CMakeFiles/serverlib.dir/timer/lst_timer.cpp.i
+.PHONY : timer/lst_timer.cpp.i
+
+timer/lst_timer.s: timer/lst_timer.cpp.s
 .PHONY : timer/lst_timer.s
 
-# target to build an object file
-webserver/webserver.o:
-	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/webserver/webserver.o
+# target to generate assembly for a file
+timer/lst_timer.cpp.s:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/timer/lst_timer.cpp.s
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/serverlib.dir/build.make bin/CMakeFiles/serverlib.dir/timer/lst_timer.cpp.s
+.PHONY : timer/lst_timer.cpp.s
+
+webserver/webserver.o: webserver/webserver.cpp.o
 .PHONY : webserver/webserver.o
 
-# target to preprocess a source file
-webserver/webserver.i:
-	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/webserver/webserver.i
+# target to build an object file
+webserver/webserver.cpp.o:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/webserver/webserver.cpp.o
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/serverlib.dir/build.make bin/CMakeFiles/serverlib.dir/webserver/webserver.cpp.o
+.PHONY : webserver/webserver.cpp.o
+
+webserver/webserver.i: webserver/webserver.cpp.i
 .PHONY : webserver/webserver.i
 
-# target to generate assembly for a file
-webserver/webserver.s:
-	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/webserver/webserver.s
+# target to preprocess a source file
+webserver/webserver.cpp.i:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/webserver/webserver.cpp.i
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/serverlib.dir/build.make bin/CMakeFiles/serverlib.dir/webserver/webserver.cpp.i
+.PHONY : webserver/webserver.cpp.i
+
+webserver/webserver.s: webserver/webserver.cpp.s
 .PHONY : webserver/webserver.s
+
+# target to generate assembly for a file
+webserver/webserver.cpp.s:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/webserver/webserver.cpp.s
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/serverlib.dir/build.make bin/CMakeFiles/serverlib.dir/webserver/webserver.cpp.s
+.PHONY : webserver/webserver.cpp.s
 
 # Help Target
 help:
@@ -244,6 +339,7 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... server"
+	@echo "... serverlib"
 	@echo "... CGImysql/sql_connection_pool.o"
 	@echo "... CGImysql/sql_connection_pool.i"
 	@echo "... CGImysql/sql_connection_pool.s"
