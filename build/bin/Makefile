@@ -117,48 +117,123 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
-bin/CMakeFiles/hello.dir/rule:
-	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 bin/CMakeFiles/hello.dir/rule
-.PHONY : bin/CMakeFiles/hello.dir/rule
+bin/CMakeFiles/server.dir/rule:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 bin/CMakeFiles/server.dir/rule
+.PHONY : bin/CMakeFiles/server.dir/rule
 
 # Convenience name for target.
-hello: bin/CMakeFiles/hello.dir/rule
-.PHONY : hello
+server: bin/CMakeFiles/server.dir/rule
+.PHONY : server
 
 # fast build rule for target.
-hello/fast:
-	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/hello.dir/build.make bin/CMakeFiles/hello.dir/build
-.PHONY : hello/fast
+server/fast:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/build
+.PHONY : server/fast
+
+# target to build an object file
+CGImysql/sql_connection_pool.o:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/CGImysql/sql_connection_pool.o
+.PHONY : CGImysql/sql_connection_pool.o
+
+# target to preprocess a source file
+CGImysql/sql_connection_pool.i:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/CGImysql/sql_connection_pool.i
+.PHONY : CGImysql/sql_connection_pool.i
+
+# target to generate assembly for a file
+CGImysql/sql_connection_pool.s:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/CGImysql/sql_connection_pool.s
+.PHONY : CGImysql/sql_connection_pool.s
+
+# target to build an object file
+config/config.o:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/config/config.o
+.PHONY : config/config.o
+
+# target to preprocess a source file
+config/config.i:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/config/config.i
+.PHONY : config/config.i
+
+# target to generate assembly for a file
+config/config.s:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/config/config.s
+.PHONY : config/config.s
+
+# target to build an object file
+http/http_conn.o:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/http/http_conn.o
+.PHONY : http/http_conn.o
+
+# target to preprocess a source file
+http/http_conn.i:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/http/http_conn.i
+.PHONY : http/http_conn.i
+
+# target to generate assembly for a file
+http/http_conn.s:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/http/http_conn.s
+.PHONY : http/http_conn.s
 
 # target to build an object file
 log/log.o:
-	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/hello.dir/build.make bin/CMakeFiles/hello.dir/log/log.o
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/log/log.o
 .PHONY : log/log.o
 
 # target to preprocess a source file
 log/log.i:
-	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/hello.dir/build.make bin/CMakeFiles/hello.dir/log/log.i
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/log/log.i
 .PHONY : log/log.i
 
 # target to generate assembly for a file
 log/log.s:
-	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/hello.dir/build.make bin/CMakeFiles/hello.dir/log/log.s
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/log/log.s
 .PHONY : log/log.s
 
 # target to build an object file
 main.o:
-	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/hello.dir/build.make bin/CMakeFiles/hello.dir/main.o
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/main.o
 .PHONY : main.o
 
 # target to preprocess a source file
 main.i:
-	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/hello.dir/build.make bin/CMakeFiles/hello.dir/main.i
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/main.i
 .PHONY : main.i
 
 # target to generate assembly for a file
 main.s:
-	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/hello.dir/build.make bin/CMakeFiles/hello.dir/main.s
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/main.s
 .PHONY : main.s
+
+# target to build an object file
+timer/lst_timer.o:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/timer/lst_timer.o
+.PHONY : timer/lst_timer.o
+
+# target to preprocess a source file
+timer/lst_timer.i:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/timer/lst_timer.i
+.PHONY : timer/lst_timer.i
+
+# target to generate assembly for a file
+timer/lst_timer.s:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/timer/lst_timer.s
+.PHONY : timer/lst_timer.s
+
+# target to build an object file
+webserver/webserver.o:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/webserver/webserver.o
+.PHONY : webserver/webserver.o
+
+# target to preprocess a source file
+webserver/webserver.i:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/webserver/webserver.i
+.PHONY : webserver/webserver.i
+
+# target to generate assembly for a file
+webserver/webserver.s:
+	cd /home/chenranran/Program/hancy/build && $(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/webserver/webserver.s
+.PHONY : webserver/webserver.s
 
 # Help Target
 help:
@@ -168,13 +243,28 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... hello"
+	@echo "... server"
+	@echo "... CGImysql/sql_connection_pool.o"
+	@echo "... CGImysql/sql_connection_pool.i"
+	@echo "... CGImysql/sql_connection_pool.s"
+	@echo "... config/config.o"
+	@echo "... config/config.i"
+	@echo "... config/config.s"
+	@echo "... http/http_conn.o"
+	@echo "... http/http_conn.i"
+	@echo "... http/http_conn.s"
 	@echo "... log/log.o"
 	@echo "... log/log.i"
 	@echo "... log/log.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... timer/lst_timer.o"
+	@echo "... timer/lst_timer.i"
+	@echo "... timer/lst_timer.s"
+	@echo "... webserver/webserver.o"
+	@echo "... webserver/webserver.i"
+	@echo "... webserver/webserver.s"
 .PHONY : help
 
 

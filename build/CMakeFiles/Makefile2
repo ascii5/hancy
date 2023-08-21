@@ -78,7 +78,7 @@ clean: bin/clean
 # Directory level rules for directory bin
 
 # Recursive "all" directory target.
-bin/all: bin/CMakeFiles/hello.dir/all
+bin/all: bin/CMakeFiles/server.dir/all
 .PHONY : bin/all
 
 # Recursive "preinstall" directory target.
@@ -86,34 +86,34 @@ bin/preinstall:
 .PHONY : bin/preinstall
 
 # Recursive "clean" directory target.
-bin/clean: bin/CMakeFiles/hello.dir/clean
+bin/clean: bin/CMakeFiles/server.dir/clean
 .PHONY : bin/clean
 
 #=============================================================================
-# Target rules for target bin/CMakeFiles/hello.dir
+# Target rules for target bin/CMakeFiles/server.dir
 
 # All Build rule for target.
-bin/CMakeFiles/hello.dir/all:
-	$(MAKE) $(MAKESILENT) -f bin/CMakeFiles/hello.dir/build.make bin/CMakeFiles/hello.dir/depend
-	$(MAKE) $(MAKESILENT) -f bin/CMakeFiles/hello.dir/build.make bin/CMakeFiles/hello.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/chenranran/Program/hancy/build/CMakeFiles --progress-num=1,2,3 "Built target hello"
-.PHONY : bin/CMakeFiles/hello.dir/all
+bin/CMakeFiles/server.dir/all:
+	$(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/depend
+	$(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/chenranran/Program/hancy/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8 "Built target server"
+.PHONY : bin/CMakeFiles/server.dir/all
 
 # Build rule for subdir invocation for target.
-bin/CMakeFiles/hello.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/chenranran/Program/hancy/build/CMakeFiles 3
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 bin/CMakeFiles/hello.dir/all
+bin/CMakeFiles/server.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/chenranran/Program/hancy/build/CMakeFiles 8
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 bin/CMakeFiles/server.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/chenranran/Program/hancy/build/CMakeFiles 0
-.PHONY : bin/CMakeFiles/hello.dir/rule
+.PHONY : bin/CMakeFiles/server.dir/rule
 
 # Convenience name for target.
-hello: bin/CMakeFiles/hello.dir/rule
-.PHONY : hello
+server: bin/CMakeFiles/server.dir/rule
+.PHONY : server
 
 # clean rule for target.
-bin/CMakeFiles/hello.dir/clean:
-	$(MAKE) $(MAKESILENT) -f bin/CMakeFiles/hello.dir/build.make bin/CMakeFiles/hello.dir/clean
-.PHONY : bin/CMakeFiles/hello.dir/clean
+bin/CMakeFiles/server.dir/clean:
+	$(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/clean
+.PHONY : bin/CMakeFiles/server.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

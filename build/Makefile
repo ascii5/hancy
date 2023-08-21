@@ -117,17 +117,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named hello
+# Target rules for targets named server
 
 # Build rule for target.
-hello: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 hello
-.PHONY : hello
+server: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 server
+.PHONY : server
 
 # fast build rule for target.
-hello/fast:
-	$(MAKE) $(MAKESILENT) -f bin/CMakeFiles/hello.dir/build.make bin/CMakeFiles/hello.dir/build
-.PHONY : hello/fast
+server/fast:
+	$(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/build
+.PHONY : server/fast
 
 # Help Target
 help:
@@ -137,7 +137,7 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... hello"
+	@echo "... server"
 .PHONY : help
 
 
