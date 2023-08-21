@@ -238,3 +238,11 @@ httpConn::HTTP_CODE httpConn::parseHeaders(char* text){
     }
     return NO_REQUEST;
 }
+httpConn::HTTP_CODE httpConn::parseContent(char* text){
+    if(mReadIdx >= (mContentLength + mCheckedIdx)){
+        text[mContentLength] = '\0';
+        mString = text;
+        return GET_REQUEST;
+    }
+    return NO_REQUEST;
+}
