@@ -9,6 +9,8 @@ WebServer::WebServer()
     //sever_path当前webser文件的路径
     char server_path[200];
     getcwd(server_path, 200);
+    
+    
     string s_root(server_path);
     //cout<<s_root<<endl;
     size_t len = s_root.find_last_of("\\/");
@@ -23,6 +25,8 @@ WebServer::WebServer()
     strcpy(m_root, s_root.c_str());
     strcat(m_root, root);
     //cout<<m_root<<std::endl;
+    
+    
     //定时器
     users_timer = new client_data[MAX_FD];
 }

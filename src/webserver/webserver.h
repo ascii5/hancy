@@ -24,7 +24,7 @@ class WebServer
 public:
     WebServer();
     ~WebServer();
-
+public:
     void init(int port , string user, string passWord, string databaseName,
               int log_write , int opt_linger, int trigmode, int sql_num,
               int thread_num, int close_log, int actor_model);
@@ -35,6 +35,7 @@ public:
     void trig_mode();
     void eventListen();
     void eventLoop();
+public:
     void timer(int connfd, struct sockaddr_in client_address);
     void adjust_timer(util_timer *timer);
     void deal_timer(util_timer *timer, int sockfd);

@@ -10,9 +10,9 @@ class Config
 public:
     Config();
     ~Config(){};
-
+public:
     void parse_arg(int argc, char*argv[]);
-
+public:
     //端口号
     int PORT;
 

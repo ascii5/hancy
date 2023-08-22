@@ -15,6 +15,7 @@ public:
     /*thread_number是线程池中线程的数量，max_requests是请求队列中最多允许的、等待处理的请求的数量*/
     threadpool(int actor_model, connection_pool *connPool, int thread_number = 8, int max_request = 10000);
     ~threadpool();
+public:
     bool append(T *request, int state);
     bool append_p(T *request);
 
@@ -38,6 +39,7 @@ threadpool<T>::threadpool( int actor_model, connection_pool *connPool, int threa
 {
     if (thread_number <= 0 || max_requests <= 0)
         throw std::exception();
+    //线程数组
     m_threads = new pthread_t[m_thread_number];
     if (!m_threads)
         throw std::exception();
@@ -113,13 +115,18 @@ void threadpool<T>::run()
         m_queuelocker.unlock();
         if (!request)
             continue;
+        //proactor --m_actor_model = 0
+        //reactor  --m_actor_model = 1
         if (1 == m_actor_model)
         {
+            //m_state 读为0，写为1
+            //request 为http_conn类型
             if (0 == request->m_state)
             {
                 if (request->read_once())
                 {
                     request->improv = 1;
+                    //连接池初始化mysql连接(采用RAII方式在出作用域后自动释放资源)
                     connectionRAII mysqlcon(&request->mysql, m_connPool);
                     request->process();
                 }
