@@ -264,7 +264,9 @@ http_conn::HTTP_CODE http_conn::parse_request_line(char *text)
     else
         return BAD_REQUEST;
 
-    //strspn() 用于计算一个字符串中连续包含另一个字符串中指定字符集合的字符的长度。
+    //strspn() 用于计算一个字符串(参数1)中连续包含另一个字符串(参数2)中指定字符集合的字符的长度。
+    //这里的作用是跳过可能存在的空格和/t
+    //strbrk() 用于查找第一个字符串(参数1)中字符集合(参数2)任意字符的第一个位置
     m_url += strspn(m_url, " \t");
     m_version = strpbrk(m_url, " \t");
     if (!m_version)
@@ -276,6 +278,8 @@ http_conn::HTTP_CODE http_conn::parse_request_line(char *text)
     if (strncasecmp(m_url, "http://", 7) == 0)
     {
         m_url += 7;
+        //strchr查找指定字符的第一个出现位置
+        //即去掉域名的文件路径
         m_url = strchr(m_url, '/');
     }
 
@@ -288,8 +292,10 @@ http_conn::HTTP_CODE http_conn::parse_request_line(char *text)
     if (!m_url || m_url[0] != '/')
         return BAD_REQUEST;
     //当url为/时，显示判断界面
+    //默认为judge页面
     if (strlen(m_url) == 1)
         strcat(m_url, "judge.html");
+    //主状态机改变
     m_check_state = CHECK_STATE_HEADER;
     return NO_REQUEST;
 }
@@ -306,6 +312,7 @@ http_conn::HTTP_CODE http_conn::parse_headers(char *text)
         }
         return GET_REQUEST;
     }
+    //仅支持部分头部字段的解析
     else if (strncasecmp(text, "Connection:", 11) == 0)
     {
         text += 11;
@@ -370,6 +377,8 @@ http_conn::HTTP_CODE http_conn::process_read()
             }
             case CHECK_STATE_HEADER:
             {
+                //解析单个头部信息，解析完成后进行判断是否存在content
+                //get请求直接调用do_request进行处理，否则解析content
                 ret = parse_headers(text);
                 if (ret == BAD_REQUEST)
                     return BAD_REQUEST;
@@ -381,9 +390,11 @@ http_conn::HTTP_CODE http_conn::process_read()
             }
             case CHECK_STATE_CONTENT:
             {
+                //使用m_string获取post请求的内容(用户名&密码)
                 ret = parse_content(text);
                 if (ret == GET_REQUEST)
                     return do_request();
+                //解析完成跳出循环
                 line_status = LINE_OPEN;
                 break;
             }

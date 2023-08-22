@@ -6,5 +6,5 @@ CXX_DEFINES =
 
 CXX_INCLUDES = -I/usr/include/mysql/mysql.h
 
-CXX_FLAGS = 
+CXX_FLAGS = -std=gnu++11
 
