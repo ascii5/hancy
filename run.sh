@@ -1,1 +1,4 @@
-g++ ./src/lock/locker.h ./src/log/blockQueue.h ./src/log/blockQueue.cc ./src/log/log.h ./src/log/log.cc ./src/main.cc -o ./bin/test
+cd build
+cmake ..
+make
+../bin/server
