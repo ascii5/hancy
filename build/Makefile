@@ -126,7 +126,7 @@ server: cmake_check_build_system
 
 # fast build rule for target.
 server/fast:
-	$(MAKE) $(MAKESILENT) -f bin/CMakeFiles/server.dir/build.make bin/CMakeFiles/server.dir/build
+	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/server.dir/build.make src/CMakeFiles/server.dir/build
 .PHONY : server/fast
 
 #=============================================================================
@@ -139,7 +139,7 @@ serverlib: cmake_check_build_system
 
 # fast build rule for target.
 serverlib/fast:
-	$(MAKE) $(MAKESILENT) -f bin/CMakeFiles/serverlib.dir/build.make bin/CMakeFiles/serverlib.dir/build
+	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/serverlib.dir/build.make src/CMakeFiles/serverlib.dir/build
 .PHONY : serverlib/fast
 
 # Help Target
