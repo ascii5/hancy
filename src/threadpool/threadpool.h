@@ -128,6 +128,7 @@ void threadpool<T>::run()
                     request->improv = 1;
                     //连接池初始化mysql连接(采用RAII方式在出作用域后自动释放资源)
                     connectionRAII mysqlcon(&request->mysql, m_connPool);
+                    //process() 从缓冲区读入数据并且向缓冲区写入response
                     request->process();
                 }
                 else
@@ -136,8 +137,10 @@ void threadpool<T>::run()
                     request->timer_flag = 1;
                 }
             }
+            //分为多多个线程一部分是读线程，一部分是写线程
             else
             {
+                //write() 从缓冲区和文件向m_sockfd写入数据
                 if (request->write())
                 {
                     request->improv = 1;

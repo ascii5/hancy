@@ -12,7 +12,7 @@ WebServer::WebServer()
     
     
     string s_root(server_path);
-    cout<<s_root<<endl;
+    //cout<<s_root<<endl;
     size_t len = s_root.find_last_of("\\/");
     if(len != string::npos)
         s_root = s_root.substr(0,len);
@@ -24,7 +24,7 @@ WebServer::WebServer()
     m_root = (char *)malloc(strlen(s_root.c_str()) + strlen(root) + 1);
     strcpy(m_root, s_root.c_str());
     strcat(m_root, root);
-    cout<<m_root<<std::endl;
+    //cout<<m_root<<std::endl;
     
     
     //定时器

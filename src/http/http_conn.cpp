@@ -368,6 +368,7 @@ http_conn::HTTP_CODE http_conn::process_read()
         LOG_INFO("%s", text);
         switch (m_check_state)
         {
+            //解析请求行
             case CHECK_STATE_REQUESTLINE:
             {
                 ret = parse_request_line(text);
@@ -407,11 +408,13 @@ http_conn::HTTP_CODE http_conn::process_read()
 
 http_conn::HTTP_CODE http_conn::do_request()
 {
+    //doc_root = root(网站根目录)
     strcpy(m_real_file, doc_root);
     int len = strlen(doc_root);
     //printf("m_url:%s\n", m_url);
     const char *p = strrchr(m_url, '/');
 
+    //post请求设置cgi位
     //处理cgi
     if (cgi == 1 && (*(p + 1) == '2' || *(p + 1) == '3'))
     {
@@ -450,6 +453,8 @@ http_conn::HTTP_CODE http_conn::do_request()
             strcat(sql_insert, password);
             strcat(sql_insert, "')");
 
+
+            //users 是一个map存储密码和用户名
             if (users.find(name) == users.end())
             {
                 m_lock.lock();
@@ -519,6 +524,7 @@ http_conn::HTTP_CODE http_conn::do_request()
     else
         strncpy(m_real_file + len, m_url, FILENAME_LEN - len - 1);
 
+    //stat() 用于获取文件的属性存储在stat结构体里面
     if (stat(m_real_file, &m_file_stat) < 0)
         return NO_RESOURCE;
 
@@ -529,6 +535,7 @@ http_conn::HTTP_CODE http_conn::do_request()
         return BAD_REQUEST;
 
     int fd = open(m_real_file, O_RDONLY);
+    //mmap() 将文件映射到内存中提高响应速度
     m_file_address = (char *)mmap(0, m_file_stat.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
     close(fd);
     return FILE_REQUEST;
@@ -554,12 +561,15 @@ bool http_conn::write()
 
     while (1)
     {
+        //weitev() 顺序向m_sockfd写入数据(从缓冲区)
         temp = writev(m_sockfd, m_iv, m_iv_count);
 
         if (temp < 0)
         {
+            //EAGAIN 状态码暂时写完数据
             if (errno == EAGAIN)
             {
+                //重新监听写事件
                 modfd(m_epollfd, m_sockfd, EPOLLOUT, m_TRIGMode);
                 return true;
             }
@@ -569,6 +579,7 @@ bool http_conn::write()
 
         bytes_have_send += temp;
         bytes_to_send -= temp;
+        //m_iv[0] 的数据已经发送完毕了
         if (bytes_have_send >= m_iv[0].iov_len)
         {
             m_iv[0].iov_len = 0;
@@ -584,6 +595,7 @@ bool http_conn::write()
         if (bytes_to_send <= 0)
         {
             unmap();
+            //重新监听读事件
             modfd(m_epollfd, m_sockfd, EPOLLIN, m_TRIGMode);
 
             if (m_linger)
@@ -707,9 +719,12 @@ bool http_conn::process_write(HTTP_CODE ret)
 }
 void http_conn::process()
 {
+    //process_read() 读取(从缓冲区)并判断请求页面(设置m_url)
     HTTP_CODE read_ret = process_read();
+    //NO_REQUEST 请求不完整，需要继续请求报文数据
     if (read_ret == NO_REQUEST)
     {
+        //监听读事件
         modfd(m_epollfd, m_sockfd, EPOLLIN, m_TRIGMode);
         return;
     }
@@ -718,5 +733,6 @@ void http_conn::process()
     {
         close_conn();
     }
+    //监听写事件
     modfd(m_epollfd, m_sockfd, EPOLLOUT, m_TRIGMode);
 }
