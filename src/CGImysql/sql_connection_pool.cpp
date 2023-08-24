@@ -23,6 +23,7 @@ connection_pool *connection_pool::GetInstance()
 }
 
 //构造初始化
+//m_url 为 localhost
 void connection_pool::init(string url, string User, string PassWord, string DBName, int Port, int MaxConn, int close_log)
 {
 	m_url = url;

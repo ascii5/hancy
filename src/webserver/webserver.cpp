@@ -91,6 +91,7 @@ void WebServer::log_write()
     if (0 == m_close_log)
     {
         //初始化日志
+        //m_log_write == 1 为异步模式
         if (1 == m_log_write)
             Log::get_instance()->init("./ServerLog", m_close_log, 2000, 800000, 800);
         else
@@ -103,6 +104,7 @@ void WebServer::sql_pool()
     //初始化数据库连接池
     m_connPool = connection_pool::GetInstance();
     //connectionPool 采用一个链表来存储连接(连接池)
+    //循环创建mysql连接加入到链表中
     m_connPool->init("localhost", m_user, m_passWord, m_databaseName, 3306, m_sql_num, m_close_log);
 
     //初始化数据库读取表(httpconn中的map)
@@ -112,7 +114,7 @@ void WebServer::sql_pool()
 void WebServer::thread_pool()
 {
     //线程池
-    //m_actormodel 并发模型 proactor 和 actor
+    //m_actormodel 并发模型 proactor 和 reactor
     //m_connPool 数据库连接池
     //m_threadNum 线程数量
     //初始化线程池
@@ -367,6 +369,7 @@ void WebServer::dealwithread(int sockfd)
         else
         {
             deal_timer(timer, sockfd);
+            //dealtime() 删除定时器，sockfd(关闭)
         }
     }
 }
@@ -474,10 +477,12 @@ void WebServer::eventLoop()
         }
         if (timeout)
         {
+            //调用tick清理函数，清理链表上的过期连接
             utils.timer_handler();
 
             LOG_INFO("%s", "timer tick");
 
+            //清理后重新给 timeout 赋值为 false 
             timeout = false;
         }
     }

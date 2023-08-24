@@ -19,6 +19,7 @@ Log::~Log()
         fclose(m_fp);
     }
 }
+//init() 创建文件，创建异步写线程(max_queue_size >= 1)
 //异步需要设置阻塞队列的长度，同步不需要设置
 bool Log::init(const char *file_name, int close_log, int log_buf_size, int split_lines, int max_queue_size)
 {
@@ -29,6 +30,7 @@ bool Log::init(const char *file_name, int close_log, int log_buf_size, int split
         m_log_queue = new block_queue<string>(max_queue_size);
         pthread_t tid;
         //flush_log_thread为回调函数,这里表示创建线程异步写日志
+        //调用log内部的async_write() 异步写
         pthread_create(&tid, NULL, flush_log_thread, NULL);
     }
     
