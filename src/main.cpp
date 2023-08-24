@@ -19,16 +19,17 @@ int main(int argc, char *argv[])
                 config.close_log, config.actor_model);
     
 
-    //日志
+    //日志(初始化日志)
     server.log_write();
 
-    //数据库
+    //数据库(初始化数据库,初始化httpconn中的map(用户名和密码))
     server.sql_pool();
 
-    //线程池
+    //线程池(初始化线程池)
     server.thread_pool();
 
     //触发模式
+    //LT+ET ,LT+LT ,ET+LT...
     server.trig_mode();
 
     //监听

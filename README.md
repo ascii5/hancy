@@ -1,6 +1,7 @@
 ## 什么是hancy
 hancy 是一个轻量的高性能服务器
 ## 启动
+需要cmake工具，mysqlclientdev工具，mysql
 进入项目路径
 > sudo sh run.sh
 ## todo

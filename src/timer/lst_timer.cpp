@@ -192,9 +192,13 @@ void Utils::addsig(int sig, void(handler)(int), bool restart)
     struct sigaction sa;
     memset(&sa, '\0', sizeof(sa));
     sa.sa_handler = handler;
+    //在信号处理函数返回后自动继续被中断的系统调用
     if (restart)
         sa.sa_flags |= SA_RESTART;
+    //sigfillset() 给指定信号集合添加所有的信号
+    //sa.sa_mask 为信号处理期间需要屏蔽的信号，此刻指的是屏蔽所有信号
     sigfillset(&sa.sa_mask);
+    //sigaction() 为信号设置新的处理方式
     assert(sigaction(sig, &sa, NULL) != -1);
 }
 

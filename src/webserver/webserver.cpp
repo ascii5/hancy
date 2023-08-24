@@ -102,27 +102,37 @@ void WebServer::sql_pool()
 {
     //初始化数据库连接池
     m_connPool = connection_pool::GetInstance();
+    //connectionPool 采用一个链表来存储连接(连接池)
     m_connPool->init("localhost", m_user, m_passWord, m_databaseName, 3306, m_sql_num, m_close_log);
 
-    //初始化数据库读取表
+    //初始化数据库读取表(httpconn中的map)
     users->initmysql_result(m_connPool);
 }
 
 void WebServer::thread_pool()
 {
     //线程池
+    //m_actormodel 并发模型 proactor 和 actor
+    //m_connPool 数据库连接池
+    //m_threadNum 线程数量
+    //初始化线程池
     m_pool = new threadpool<http_conn>(m_actormodel, m_connPool, m_thread_num);
 }
 
 void WebServer::eventListen()
 {
-    //网络编程基础步骤
+    //网络编程基础步骤(祖传)
     m_listenfd = socket(PF_INET, SOCK_STREAM, 0);
     assert(m_listenfd >= 0);
 
     //优雅关闭连接
     if (0 == m_OPT_LINGER)
     {
+        //     struct linger {
+        //     int l_onoff;    // 表示是否启用linger选项
+        //     int l_linger;   // 表示linger时间，单位为秒
+        // };
+        //linger 选项用来设置套接字是否立即关闭(丢弃数据)
         struct linger tmp = {0, 1};
         setsockopt(m_listenfd, SOL_SOCKET, SO_LINGER, &tmp, sizeof(tmp));
     }
@@ -136,10 +146,12 @@ void WebServer::eventListen()
     struct sockaddr_in address;
     bzero(&address, sizeof(address));
     address.sin_family = AF_INET;
+    //INADDR_ANY 接受任意ip地址的连接
     address.sin_addr.s_addr = htonl(INADDR_ANY);
     address.sin_port = htons(m_port);
 
     int flag = 1;
+    //允许端口重复绑定
     setsockopt(m_listenfd, SOL_SOCKET, SO_REUSEADDR, &flag, sizeof(flag));
     ret = bind(m_listenfd, (struct sockaddr *)&address, sizeof(address));
     assert(ret >= 0);
@@ -159,9 +171,15 @@ void WebServer::eventListen()
     ret = socketpair(PF_UNIX, SOCK_STREAM, 0, m_pipefd);
     assert(ret != -1);
     utils.setnonblocking(m_pipefd[1]);
+    //监听m_pipefd[0]
     utils.addfd(m_epollfd, m_pipefd[0], false, 0);
 
+
+    //为信号添加信号处理函数
+    //SIG_ALRM 定时器超时
+    //SIG_TERM 程序中断
     utils.addsig(SIGPIPE, SIG_IGN);
+    //向u_pipefd[0] 发送信号信息
     utils.addsig(SIGALRM, utils.sig_handler, false);
     utils.addsig(SIGTERM, utils.sig_handler, false);
 
