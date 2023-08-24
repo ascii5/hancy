@@ -183,6 +183,7 @@ void WebServer::eventListen()
     utils.addsig(SIGALRM, utils.sig_handler, false);
     utils.addsig(SIGTERM, utils.sig_handler, false);
 
+    //alarm函数会在指定的时间间隔(TIMESLOT)发送一个SIG_ALARM信号
     alarm(TIMESLOT);
 
     //工具类,信号和描述符基础操作
@@ -192,6 +193,7 @@ void WebServer::eventListen()
 
 void WebServer::timer(int connfd, struct sockaddr_in client_address)
 {
+    //初始化相对应的http_conn对象
     users[connfd].init(connfd, client_address, m_root, m_CONNTrigmode, m_close_log, m_user, m_passWord, m_databaseName);
 
     //初始化client_data数据
@@ -200,9 +202,13 @@ void WebServer::timer(int connfd, struct sockaddr_in client_address)
     users_timer[connfd].sockfd = connfd;
     util_timer *timer = new util_timer;
     timer->user_data = &users_timer[connfd];
+    //cb_func() epoll内核删除sockfd, 关闭对应的sockfd
     timer->cb_func = cb_func;
+    //time(NULL) 表示获取当前时间
+    //设置定时器的时间(绝对时间)
     time_t cur = time(NULL);
     timer->expire = cur + 3 * TIMESLOT;
+   
     users_timer[connfd].timer = timer;
     utils.m_timer_lst.add_timer(timer);
 }
@@ -220,6 +226,7 @@ void WebServer::adjust_timer(util_timer *timer)
 
 void WebServer::deal_timer(util_timer *timer, int sockfd)
 {
+    //cb_func() 从epoll中删除对应的sockfd, 并且关闭sockfd
     timer->cb_func(&users_timer[sockfd]);
     if (timer)
     {
@@ -233,6 +240,7 @@ bool WebServer::dealclinetdata()
 {
     struct sockaddr_in client_address;
     socklen_t client_addrlength = sizeof(client_address);
+    //0为LT 1为ET
     if (0 == m_LISTENTrigmode)
     {
         int connfd = accept(m_listenfd, (struct sockaddr *)&client_address, &client_addrlength);
@@ -247,6 +255,7 @@ bool WebServer::dealclinetdata()
             LOG_ERROR("%s", "Internal server busy");
             return false;
         }
+        //timer() 添加定时器
         timer(connfd, client_address);
     }
 
@@ -318,18 +327,20 @@ void WebServer::dealwithread(int sockfd)
     {
         if (timer)
         {
+            //将定时器往后延迟三个单位(TIMESLOT)
             adjust_timer(timer);
         }
 
         //若监测到读事件，将该事件放入请求队列
         m_pool->append(users + sockfd, 0);
-
+        //users httpconn类型数组
         while (true)
         {
             if (1 == users[sockfd].improv)
             {
                 if (1 == users[sockfd].timer_flag)
                 {
+                    //关闭连接，删除timer
                     deal_timer(timer, sockfd);
                     users[sockfd].timer_flag = 0;
                 }
@@ -411,6 +422,8 @@ void WebServer::eventLoop()
     bool timeout = false;
     bool stop_server = false;
 
+
+    //统一事件源
     while (!stop_server)
     {
         int number = epoll_wait(m_epollfd, events, MAX_EVENT_NUMBER, -1);
@@ -427,6 +440,7 @@ void WebServer::eventLoop()
             //处理新到的客户连接
             if (sockfd == m_listenfd)
             {
+                //dealclinetdata() 取出新到的客户连接，并且设置定时器
                 bool flag = dealclinetdata();
                 if (false == flag)
                     continue;
@@ -434,10 +448,13 @@ void WebServer::eventLoop()
             else if (events[i].events & (EPOLLRDHUP | EPOLLHUP | EPOLLERR))
             {
                 //服务器端关闭连接，移除对应的定时器
+                //epoll中删除对应的sockfd,关闭对应的sockfd
                 util_timer *timer = users_timer[sockfd].timer;
                 deal_timer(timer, sockfd);
             }
-            //处理信号
+            //处理信号(m_pipefd[0] 存在数据可读)
+            //SIG_ALARM 为 timeout = true
+            //SIG_TERM 为 stop_server = true;
             else if ((sockfd == m_pipefd[0]) && (events[i].events & EPOLLIN))
             {
                 bool flag = dealwithsignal(timeout, stop_server);
@@ -447,6 +464,7 @@ void WebServer::eventLoop()
             //处理客户连接上接收到的数据
             else if (events[i].events & EPOLLIN)
             {
+                //dealwithread() 
                 dealwithread(sockfd);
             }
             else if (events[i].events & EPOLLOUT)
