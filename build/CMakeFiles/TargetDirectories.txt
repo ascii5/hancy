@@ -1,6 +1,0 @@
-/home/chenranran/Program/hancy/build/CMakeFiles/edit_cache.dir
-/home/chenranran/Program/hancy/build/CMakeFiles/rebuild_cache.dir
-/home/chenranran/Program/hancy/build/src/CMakeFiles/server.dir
-/home/chenranran/Program/hancy/build/src/CMakeFiles/serverlib.dir
-/home/chenranran/Program/hancy/build/src/CMakeFiles/edit_cache.dir
-/home/chenranran/Program/hancy/build/src/CMakeFiles/rebuild_cache.dir
