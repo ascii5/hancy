@@ -12,7 +12,7 @@
 #include "../log/log.h"
 
 using namespace std;
-
+//连接池模块最后提供的外部接口就是connectionRAII用来从连接池初始化一个mysql连接
 class connection_pool
 {
 public:

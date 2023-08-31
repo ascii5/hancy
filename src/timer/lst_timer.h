@@ -33,6 +33,7 @@ struct client_data
     util_timer *timer;
 };
 
+//client_data 可能包含一连串的定时器，所以每个定时器有前后节点，每个定时器有自己的定时事件
 class util_timer
 {
 public:
