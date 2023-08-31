@@ -35,7 +35,7 @@ public:
     void trig_mode();
     void eventListen();
     void eventLoop();
-public:
+private:
     void timer(int connfd, struct sockaddr_in client_address);
     void adjust_timer(util_timer *timer);
     void deal_timer(util_timer *timer, int sockfd);
@@ -43,8 +43,7 @@ public:
     bool dealwithsignal(bool& timeout, bool& stop_server);
     void dealwithread(int sockfd);
     void dealwithwrite(int sockfd);
-
-public:
+private:
     //基础
     int m_port;
     char *m_root;

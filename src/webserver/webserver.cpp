@@ -6,8 +6,9 @@ WebServer::WebServer()
     users = new http_conn[MAX_FD];
 
     //root文件夹路径
-    //sever_path当前webser文件的路径
+    //sever_path当前webserver文件的路径
     char server_path[200];
+    //hancy/build
     getcwd(server_path, 200);
     
     
@@ -324,7 +325,7 @@ void WebServer::dealwithread(int sockfd)
 {
     util_timer *timer = users_timer[sockfd].timer;
 
-    //reactor
+    //reactor 工作线程io数据
     if (1 == m_actormodel)
     {
         if (timer)
@@ -353,7 +354,8 @@ void WebServer::dealwithread(int sockfd)
     }
     else
     {
-        //proactor
+        //模拟proactor 主线程负责io数据工作线程只负责工作逻辑
+        //真 proactor 是操作系统io数据，工作线程只负责工作逻辑
         if (users[sockfd].read_once())
         {
             LOG_INFO("deal with the client(%s)", inet_ntoa(users[sockfd].get_address()->sin_addr));
