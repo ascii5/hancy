@@ -108,8 +108,10 @@ void sort_timer_lst::tick()
         {
             break;
         }
+        //关闭连接操作
         tmp->cb_func(tmp->user_data);
         head = tmp->next;
+        //删除定时器连接
         if (head)
         {
             head->prev = NULL;
