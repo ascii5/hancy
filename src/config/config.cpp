@@ -17,7 +17,7 @@ Config::Config(){
     CONNTrigmode = 0;
 
     //优雅关闭链接，默认不使用
-    OPT_LINGER = 0;
+    OPT_LINGER = 1;
 
     //数据库连接池数量,默认8
     sql_num = 8;

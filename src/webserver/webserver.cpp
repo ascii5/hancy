@@ -128,22 +128,17 @@ void WebServer::eventListen()
     m_listenfd = socket(PF_INET, SOCK_STREAM, 0);
     assert(m_listenfd >= 0);
 
-    //优雅关闭连接
-    if (0 == m_OPT_LINGER)
-    {
-        //     struct linger {
-        //     int l_onoff;    // 表示是否启用linger选项
-        //     int l_linger;   // 表示linger时间，单位为秒
-        // };
-        //linger 选项用来设置套接字是否立即关闭(丢弃数据)
-        struct linger tmp = {0, 1};
-        setsockopt(m_listenfd, SOL_SOCKET, SO_LINGER, &tmp, sizeof(tmp));
+    struct linger tmp;
+    if(m_OPT_LINGER == 0){
+        tmp.l_onoff = 0;
+        tmp.l_linger = 1;
     }
-    else if (1 == m_OPT_LINGER)
-    {
-        struct linger tmp = {1, 1};
-        setsockopt(m_listenfd, SOL_SOCKET, SO_LINGER, &tmp, sizeof(tmp));
+    else{
+        tmp.l_onoff = 1;
+        tmp.l_linger = 1;
     }
+    setsockopt(m_listenfd,SOL_SOCKET,SO_LINGER,&tmp,sizeof(tmp));
+
 
     int ret = 0;
     struct sockaddr_in address;
