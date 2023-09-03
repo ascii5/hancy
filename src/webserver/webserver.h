@@ -14,6 +14,7 @@
 
 #include "../threadpool/threadpool.h"
 #include "../http/http_conn.h"
+#include "../config/config.h"
 
 const int MAX_FD = 65536;           //最大文件描述符
 const int MAX_EVENT_NUMBER = 10000; //最大事件数
@@ -22,20 +23,18 @@ const int TIMESLOT = 5;             //最小超时单位
 class WebServer
 {
 public:
-    WebServer();
+    WebServer(Config myConfig);
     ~WebServer();
 public:
-    void init(int port , string user, string passWord, string databaseName,
-              int log_write , int opt_linger, int trigmode, int sql_num,
-              int thread_num, int close_log, int actor_model);
-
+    void WebServerPrepare();
+    void eventLoop();    
+private:
     void thread_pool();
     void sql_pool();
     void log_write();
     void trig_mode();
     void eventListen();
-    void eventLoop();
-private:
+
     void timer(int connfd, struct sockaddr_in client_address);
     void adjust_timer(util_timer *timer);
     void deal_timer(util_timer *timer, int sockfd);
@@ -79,4 +78,5 @@ private:
     client_data *users_timer;
     Utils utils;
 };
+class config;
 #endif

@@ -1,7 +1,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include "../webserver/webserver.h"
+#include "../threadpool/threadpool.h"
+#include "../http/http_conn.h"
 
 using namespace std;
 
@@ -42,6 +43,11 @@ public:
 
     //并发模型选择
     int actor_model;
+
+    //数据库相关
+    string m_data_basename;
+    string m_user;
+    string m_passwd;
 };
 
 #endif

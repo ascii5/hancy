@@ -30,6 +30,11 @@ Config::Config(){
 
     //并发模型,默认是proactor
     actor_model = 0;
+
+    //需要修改的数据库信息,登录名,密码,库名
+    m_user = "root";
+    m_passwd = "123";
+    m_data_basename = "yourdb";
 }
 
 void Config::parse_arg(int argc, char*argv[]){

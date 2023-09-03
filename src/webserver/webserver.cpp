@@ -1,6 +1,6 @@
 #include "webserver.h"
 
-WebServer::WebServer()
+WebServer::WebServer(Config myConfig)
 {
     //http_conn类对象
     users = new http_conn[MAX_FD];
@@ -30,6 +30,18 @@ WebServer::WebServer()
     
     //定时器
     users_timer = new client_data[MAX_FD];
+
+    m_port = myConfig.PORT;
+    m_user = myConfig.m_user;
+    m_passWord = myConfig.m_passwd;
+    m_databaseName = myConfig.m_data_basename;
+    m_sql_num = myConfig.sql_num;
+    m_thread_num = myConfig.thread_num;
+    m_log_write = myConfig.LOGWrite;
+    m_OPT_LINGER = myConfig.OPT_LINGER;
+    m_TRIGMode = myConfig.TRIGMode;
+    m_close_log = myConfig.close_log;
+    m_actormodel = myConfig.actor_model;
 }
 
 WebServer::~WebServer()
@@ -43,20 +55,12 @@ WebServer::~WebServer()
     delete m_pool;
 }
 
-void WebServer::init(int port, string user, string passWord, string databaseName, int log_write, 
-                     int opt_linger, int trigmode, int sql_num, int thread_num, int close_log, int actor_model)
-{
-    m_port = port;
-    m_user = user;
-    m_passWord = passWord;
-    m_databaseName = databaseName;
-    m_sql_num = sql_num;
-    m_thread_num = thread_num;
-    m_log_write = log_write;
-    m_OPT_LINGER = opt_linger;
-    m_TRIGMode = trigmode;
-    m_close_log = close_log;
-    m_actormodel = actor_model;
+void WebServer::WebServerPrepare(){
+    this -> log_write();
+    this -> sql_pool();
+    this -> thread_pool();
+    this -> trig_mode();
+    this -> eventListen();
 }
 
 void WebServer::trig_mode()
