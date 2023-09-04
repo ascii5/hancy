@@ -48,6 +48,9 @@ public:
     string m_data_basename;
     string m_user;
     string m_passwd;
+
+    //网站根目录
+    string websiteRoot;
 };
 
 #endif

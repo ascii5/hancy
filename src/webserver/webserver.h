@@ -78,5 +78,4 @@ private:
     client_data *users_timer;
     Utils utils;
 };
-class config;
 #endif

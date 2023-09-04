@@ -35,6 +35,8 @@ Config::Config(){
     m_user = "root";
     m_passwd = "123";
     m_data_basename = "yourdb";
+
+    websiteRoot = "/home/chenranran/Program/hancy/website";
 }
 
 void Config::parse_arg(int argc, char*argv[]){
