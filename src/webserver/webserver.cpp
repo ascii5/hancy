@@ -92,7 +92,7 @@ void WebServer::sql_pool()
     m_connPool = connection_pool::GetInstance();
     //connectionPool 采用一个链表来存储连接(连接池)
     //循环创建mysql连接加入到链表中
-    m_connPool->init("localhost", m_user, m_passWord, m_databaseName, 3306, m_sql_num, m_close_log);
+    m_connPool->init("localhost", m_user, m_passWord, m_databaseName, 3306, m_sql_num,m_close_log);
 
     //初始化数据库读取表(httpconn中的map)
     users->initmysql_result(m_connPool);
@@ -162,6 +162,7 @@ void WebServer::eventListen()
     //为信号添加信号处理函数
     //SIG_ALRM 定时器超时
     //SIG_TERM 程序中断
+    //SIGPIPE 信号是当进程向已经关闭的管道或者套接字写入数据的时候触发1
     utils.addsig(SIGPIPE, SIG_IGN);
     //向u_pipefd[0] 发送信号信息
     utils.addsig(SIGALRM, utils.sig_handler, false);

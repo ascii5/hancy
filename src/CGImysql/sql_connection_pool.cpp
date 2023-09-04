@@ -24,7 +24,7 @@ connection_pool *connection_pool::GetInstance()
 
 //构造初始化
 //m_url 为 localhost
-void connection_pool::init(string url, string User, string PassWord, string DBName, int Port, int MaxConn, int close_log)
+void connection_pool::init(string url, string User, string PassWord, string DBName, int Port, int MaxConn,int close_log)
 {
 	m_url = url;
 	m_Port = Port;
@@ -33,6 +33,7 @@ void connection_pool::init(string url, string User, string PassWord, string DBNa
 	m_DatabaseName = DBName;
 	m_close_log = close_log;
 
+	
 	for (int i = 0; i < MaxConn; i++)
 	{
 		MYSQL *con = NULL;

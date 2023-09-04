@@ -24,7 +24,7 @@ public:
 	//单例模式
 	static connection_pool *GetInstance();
 
-	void init(string url, string User, string PassWord, string DataBaseName, int Port, int MaxConn, int close_log); 
+	void init(string url, string User, string PassWord, string DataBaseName, int Port, int MaxConn,int close_log); 
 
 private:
 	connection_pool();
@@ -36,7 +36,6 @@ private:
 	locker lock;
 	list<MYSQL *> connList; //连接池
 	sem reserve;
-
 public:
 	string m_url;			 //主机地址
 	string m_Port;		 //数据库端口号

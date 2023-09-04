@@ -93,6 +93,7 @@ void sort_timer_lst::del_timer(util_timer *timer)
     timer->next->prev = timer->prev;
     delete timer;
 }
+//心跳检测
 void sort_timer_lst::tick()
 {
     if (!head)
