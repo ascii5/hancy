@@ -9,7 +9,6 @@ int main(int argc, char *argv[])
 
     WebServer server(config);
     
-    
     server.WebServerPrepare();
     server.eventLoop();
 
