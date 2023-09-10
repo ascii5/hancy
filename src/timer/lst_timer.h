@@ -53,7 +53,7 @@ class sort_timer_lst
 public:
     sort_timer_lst();
     ~sort_timer_lst();
-
+public:
     void add_timer(util_timer *timer);
     void adjust_timer(util_timer *timer);
     void del_timer(util_timer *timer);
@@ -71,7 +71,7 @@ class Utils
 public:
     Utils() {}
     ~Utils() {}
-
+public:
     void init(int timeslot);
 
     //对文件描述符设置非阻塞
