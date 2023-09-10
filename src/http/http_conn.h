@@ -84,7 +84,7 @@ public:
     }
     void initmysql_result(connection_pool *connPool);
     int timer_flag;
-    int improv;
+    int is_processed;
 
 
 private:

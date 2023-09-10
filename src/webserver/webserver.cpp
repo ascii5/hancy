@@ -320,9 +320,10 @@ void WebServer::dealwithread(int sockfd)
         //若监测到读事件，将该事件放入请求队列
         m_pool->append(users + sockfd, 0);
         //users httpconn类型数组
+        //httpconn::is_processed 的意思是是否被处理过
         while (true)
         {
-            if (1 == users[sockfd].improv)
+            if (1 == users[sockfd].is_processed)
             {
                 if (1 == users[sockfd].timer_flag)
                 {
@@ -330,7 +331,7 @@ void WebServer::dealwithread(int sockfd)
                     deal_timer(timer, sockfd);
                     users[sockfd].timer_flag = 0;
                 }
-                users[sockfd].improv = 0;
+                users[sockfd].is_processed = 0;
                 break;
             }
         }
@@ -374,14 +375,14 @@ void WebServer::dealwithwrite(int sockfd)
 
         while (true)
         {
-            if (1 == users[sockfd].improv)
+            if (1 == users[sockfd].is_processed)
             {
                 if (1 == users[sockfd].timer_flag)
                 {
                     deal_timer(timer, sockfd);
                     users[sockfd].timer_flag = 0;
                 }
-                users[sockfd].improv = 0;
+                users[sockfd].is_processed = 0;
                 break;
             }
         }
@@ -409,8 +410,8 @@ void WebServer::eventLoop()
 {
     bool timeout = false;
     bool stop_server = false;
-
-
+ 
+ 
     //统一事件源
     while (!stop_server)
     {

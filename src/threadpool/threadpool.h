@@ -130,7 +130,7 @@ void threadpool<T>::run()
             {
                 if (request->read_once())
                 {
-                    request->improv = 1;
+                    request->is_processed = 1;
                     //连接池初始化mysql连接(采用RAII方式在出作用域后自动释放资源)
                     connectionRAII mysqlcon(&request->mysql, m_connPool);
                     //process() 从缓冲区读入数据并且向缓冲区写入response
@@ -138,7 +138,7 @@ void threadpool<T>::run()
                 }
                 else
                 {
-                    request->improv = 1;
+                    request->is_processed = 1;
                     request->timer_flag = 1;
                 }
             }
@@ -148,11 +148,11 @@ void threadpool<T>::run()
                 //write() 从缓冲区和文件向m_sockfd写入数据
                 if (request->write())
                 {
-                    request->improv = 1;
+                    request->is_processed = 1;
                 }
                 else
                 {
-                    request->improv = 1;
+                    request->is_processed = 1;
                     request->timer_flag = 1;
                 }
             }
