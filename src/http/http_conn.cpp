@@ -427,7 +427,7 @@ http_conn::HTTP_CODE http_conn::do_request()
         strcat(m_url_real, m_url + 2);
         strncpy(m_real_file + len, m_url_real, FILENAME_LEN - len - 1);
         free(m_url_real);
-
+        //cout<<m_real_file<<endl;
         //将用户名和密码提取出来
         //user=123&passwd=123
         char name[100], password[100];
