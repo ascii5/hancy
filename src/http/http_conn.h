@@ -20,6 +20,9 @@
 #include <sys/wait.h>
 #include <sys/uio.h>
 #include <map>
+#include <string>
+#include <sstream>
+
 
 #include "../lock/locker.h"
 #include "../CGImysql/sql_connection_pool.h"
@@ -83,10 +86,9 @@ public:
         return &m_address;
     }
     void initmysql_result(connection_pool *connPool);
+public:
     int timer_flag;
     int is_processed;
-
-
 private:
     void init();
     HTTP_CODE process_read();

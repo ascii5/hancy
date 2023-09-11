@@ -299,7 +299,6 @@ http_conn::HTTP_CODE http_conn::parse_request_line(char *text)
     m_check_state = CHECK_STATE_HEADER;
     return NO_REQUEST;
 }
-
 //解析http请求的一个头部信息
 http_conn::HTTP_CODE http_conn::parse_headers(char *text)
 {
