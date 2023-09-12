@@ -1,4 +1,4 @@
-/build/*
-/lib/*
-/log/*
+/log
+/build
+/lib
 /.vscode
