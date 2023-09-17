@@ -294,7 +294,7 @@ http_conn::HTTP_CODE http_conn::parse_request_line(char *text)
     //当url为/时，显示判断界面
     //默认为judge页面
     if (strlen(m_url) == 1)
-        strcat(m_url, "judge.html");
+        strcat(m_url, "index.html");
     //主状态机改变
     m_check_state = CHECK_STATE_HEADER;
     return NO_REQUEST;
