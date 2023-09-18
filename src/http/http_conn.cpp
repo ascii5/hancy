@@ -107,6 +107,7 @@ void http_conn::close_conn(bool real_close)
         m_sockfd = -1;
         m_user_count--;
     }
+    //printf("m_user_count:%d\n",m_user_count);
 }
 
 //初始化连接,外部调用初始化套接字地址
@@ -412,7 +413,6 @@ http_conn::HTTP_CODE http_conn::do_request()
     int len = strlen(doc_root);
     //printf("m_url:%s\n", m_url);
     const char *p = strrchr(m_url, '/');
-
     //post请求设置cgi位
     //处理cgi
     if (cgi == 1 && (*(p + 1) == '2' || *(p + 1) == '3'))
@@ -462,28 +462,28 @@ http_conn::HTTP_CODE http_conn::do_request()
                 m_lock.unlock();
 
                 if (!res)
-                    strcpy(m_url, "/log.html");
+                    strcpy(m_url, "/html/log.html");
                 else
-                    strcpy(m_url, "/registerError.html");
+                    strcpy(m_url, "/html/registerError.html");
             }
             else
-                strcpy(m_url, "/registerError.html");
+                strcpy(m_url, "/html/registerError.html");
         }
         //如果是登录，直接判断
         //若浏览器端输入的用户名和密码在表中可以查找到，返回1，否则返回0
         else if (*(p + 1) == '2')
         {
             if (users.find(name) != users.end() && users[name] == password)
-                strcpy(m_url, "/welcome.html");
+                strcpy(m_url, "/html/welcome.html");
             else
-                strcpy(m_url, "/logError.html");
+                strcpy(m_url, "/html/logError.html");
         }
     }
 
     if (*(p + 1) == '0')
     {
         char *m_url_real = (char *)malloc(sizeof(char) * 200);
-        strcpy(m_url_real, "/register.html");
+        strcpy(m_url_real, "/html/register.html");
         strncpy(m_real_file + len, m_url_real, strlen(m_url_real));
 
         free(m_url_real);
@@ -491,7 +491,7 @@ http_conn::HTTP_CODE http_conn::do_request()
     else if (*(p + 1) == '1')
     {
         char *m_url_real = (char *)malloc(sizeof(char) * 200);
-        strcpy(m_url_real, "/log.html");
+        strcpy(m_url_real, "/html/log.html");
         strncpy(m_real_file + len, m_url_real, strlen(m_url_real));
 
         free(m_url_real);
@@ -499,7 +499,7 @@ http_conn::HTTP_CODE http_conn::do_request()
     else if (*(p + 1) == '5')
     {
         char *m_url_real = (char *)malloc(sizeof(char) * 200);
-        strcpy(m_url_real, "/picture.html");
+        strcpy(m_url_real, "/html/picture.html");
         strncpy(m_real_file + len, m_url_real, strlen(m_url_real));
 
         free(m_url_real);
@@ -507,7 +507,7 @@ http_conn::HTTP_CODE http_conn::do_request()
     else if (*(p + 1) == '6')
     {
         char *m_url_real = (char *)malloc(sizeof(char) * 200);
-        strcpy(m_url_real, "/video.html");
+        strcpy(m_url_real, "/html/video.html");
         strncpy(m_real_file + len, m_url_real, strlen(m_url_real));
 
         free(m_url_real);
@@ -515,17 +515,31 @@ http_conn::HTTP_CODE http_conn::do_request()
     else if (*(p + 1) == '7')
     {
         char *m_url_real = (char *)malloc(sizeof(char) * 200);
-        strcpy(m_url_real, "/fans.html");
+        strcpy(m_url_real, "/html/fans.html");
         strncpy(m_real_file + len, m_url_real, strlen(m_url_real));
 
         free(m_url_real);
     }
-    else
-        strncpy(m_real_file + len, m_url, FILENAME_LEN - len - 1);
+    else if(*(p + 1) == '8'){
+        char *m_url_real = (char*)malloc(sizeof(char)*200);
+        strcpy(m_url_real,"/html/upload.html");
+        strncpy(m_real_file + len,m_url_real,strlen(m_url_real));
+        free(m_url_real);
+    }
+    else if(*(p + 1) == '9'){
+        return FILE_UPLOAD;
+    }
+    else{
+        strncpy(m_real_file + len, m_url, FILENAME_LEN - len - 1);   
+    }
 
     //stat() 用于获取文件的属性存储在stat结构体里面
-    if (stat(m_real_file, &m_file_stat) < 0)
+    if (stat(m_real_file, &m_file_stat) < 0){
+        //cout<<"break point"<<endl;
+        //cout<<strerror(errno)<<endl;
+        //cout<<m_real_file<<endl;
         return NO_RESOURCE;
+    }
 
     if (!(m_file_stat.st_mode & S_IROTH))
         return FORBIDDEN_REQUEST;
@@ -659,6 +673,7 @@ bool http_conn::add_content(const char *content)
 }
 bool http_conn::process_write(HTTP_CODE ret)
 {
+    //cout<<ret<<endl;
     switch (ret)
     {
     case INTERNAL_ERROR:
@@ -673,8 +688,9 @@ bool http_conn::process_write(HTTP_CODE ret)
     {
         add_status_line(404, error_404_title);
         add_headers(strlen(error_404_form));
-        if (!add_content(error_404_form))
+        if (!add_content(error_404_form)){
             return false;
+        }
         break;
     }
     case FORBIDDEN_REQUEST:
@@ -707,6 +723,15 @@ bool http_conn::process_write(HTTP_CODE ret)
                 return false;
         }
     }
+    case FILE_UPLOAD:
+    {
+        add_status_line(200,ok_200_title);
+        const char* ok_string =  "<html><body><strong><p>file upload</p></strong></body></html>";
+        add_headers(strlen(ok_string));
+        if(!add_content(ok_string))
+            return false;
+        break;
+    }
     default:
         return false;
     }
@@ -728,6 +753,7 @@ void http_conn::process()
         return;
     }
     bool write_ret = process_write(read_ret);
+    //cout<<"write_ret:%d"<<write_ret<<endl;
     if (!write_ret)
     {
         close_conn();

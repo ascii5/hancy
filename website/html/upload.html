@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>上传文件页面</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+          }
+
+          .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+          }
+
+          .form-group {
+            margin-bottom: 20px;
+          }
+
+          .form-group label {
+            display: block;
+            margin-bottom: 5px;
+          }
+
+          .form-group input[type="file"] {
+            display: block;
+          }
+
+          .form-group button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+          }
+      </style>
+    </head>
+    <body>
+        <div class="container">
+            <h2>上传文件</h2>
+            <form id="uploadForm" enctype="multipart/form-data" action="9" method = "post">
+                <div class="form-group">
+                    <label for="file">选择文件：</label>
+                    <input type="file" id="file" name="file" required>
+                </div>
+                <button type="submit">上传</button>
+            </form>
+        </div>
+    </body>
+</html>

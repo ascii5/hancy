@@ -22,7 +22,7 @@
 #include <map>
 #include <string>
 #include <sstream>
-
+#include <errno.h>
 
 #include "../lock/locker.h"
 #include "../CGImysql/sql_connection_pool.h"
@@ -55,14 +55,16 @@ public:
     };
     enum HTTP_CODE
     {
-        NO_REQUEST,
+        NO_REQUEST = 0,
         GET_REQUEST,
         BAD_REQUEST,
         NO_RESOURCE,
         FORBIDDEN_REQUEST,
         FILE_REQUEST,
         INTERNAL_ERROR,
-        CLOSED_CONNECTION
+        CLOSED_CONNECTION,
+        FILE_UPLOAD,
+        FILE_DOWNLOAD
     };
     enum LINE_STATUS
     {
