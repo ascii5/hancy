@@ -526,7 +526,14 @@ http_conn::HTTP_CODE http_conn::do_request()
         strncpy(m_real_file + len,m_url_real,strlen(m_url_real));
         free(m_url_real);
     }
+    //文件上传功能实现
     else if(*(p + 1) == '9'){
+        if(m_method == POST && m_content_length != 0){
+            // std::cout<<"break point"<<std::endl;
+            // std::cout<<m_string<<std::endl;
+            //std::string path(websiteRoot.c_str());
+
+        }
         return FILE_UPLOAD;
     }
     else{
@@ -726,7 +733,7 @@ bool http_conn::process_write(HTTP_CODE ret)
     case FILE_UPLOAD:
     {
         add_status_line(200,ok_200_title);
-        const char* ok_string =  "<html><body><strong><p>file upload</p></strong></body></html>";
+        const char* ok_string =  "<html><body>upload Error</body></html>";
         add_headers(strlen(ok_string));
         if(!add_content(ok_string))
             return false;

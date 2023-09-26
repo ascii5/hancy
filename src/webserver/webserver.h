@@ -23,7 +23,7 @@ const int TIMESLOT = 5;             //最小超时单位
 class WebServer
 {
 public:
-    WebServer(Config myConfig);
+    WebServer();
     ~WebServer();
 public:
     void WebServerPrepare();

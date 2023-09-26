@@ -1,29 +1,29 @@
 #include "webserver.h"
 
-WebServer::WebServer(Config myConfig)
+WebServer::WebServer()
 {
     //http_conn类对象
     users = new http_conn[MAX_FD];
 
 
-    m_root = (char *)malloc(strlen(myConfig.websiteRoot.c_str())+1);
-    strcpy(m_root,myConfig.websiteRoot.c_str());
+    m_root = (char *)malloc(strlen(Config::websiteRoot.c_str())+1);
+    strcpy(m_root,Config::websiteRoot.c_str());
     
     
     //定时器
     users_timer = new client_data[MAX_FD];
 
-    m_port = myConfig.PORT;
-    m_user = myConfig.m_user;
-    m_passWord = myConfig.m_passwd;
-    m_databaseName = myConfig.m_data_basename;
-    m_sql_num = myConfig.sql_num;
-    m_thread_num = myConfig.thread_num;
-    m_log_write = myConfig.LOGWrite;
-    m_OPT_LINGER = myConfig.OPT_LINGER;
-    m_TRIGMode = myConfig.TRIGMode;
-    m_close_log = myConfig.close_log;
-    m_actormodel = myConfig.actor_model;
+    m_port = Config::PORT;
+    m_user = Config::m_user;
+    m_passWord = Config::m_passwd;
+    m_databaseName = Config::m_data_basename;
+    m_sql_num = Config::sql_num;
+    m_thread_num = Config::thread_num;
+    m_log_write = Config::LOGWrite;
+    m_OPT_LINGER = Config::OPT_LINGER;
+    m_TRIGMode = Config::TRIGMode;
+    m_close_log = Config::close_log;
+    m_actormodel = Config::actor_model;
 }
 
 WebServer::~WebServer()

@@ -6,6 +6,8 @@ mysqlclient
 )
 TARGET_SOURCES(serverlib
 PUBLIC
+    ./config/config.h
+    ./config/config.cpp
     ./lock/locker.h
     ./log/block_queue.h
     ./log/log.h
@@ -19,8 +21,6 @@ PUBLIC
     ./threadpool/threadpool.h
     ./webserver/webserver.h
     ./webserver/webserver.cpp
-    ./config/config.h
-    ./config/config.cpp
 )
 TARGET_LINK_LIBRARIES(server
 PRIVATE

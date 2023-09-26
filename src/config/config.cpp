@@ -1,44 +1,30 @@
 #include "config.h"
-
-Config::Config(){
-    //端口号,默认9006
-    PORT = 9006;
-
-    //日志写入方式，默认同步
-    LOGWrite = 0;
-
-    //触发组合模式,默认listenfd LT + connfd LT
-    TRIGMode = 0;
-
-    //listenfd触发模式，默认LT
-    LISTENTrigmode = 0;
-
-    //connfd触发模式，默认LT
-    CONNTrigmode = 0;
-
-    //优雅关闭链接，默认不使用
-    OPT_LINGER = 1;
-
-    //数据库连接池数量,默认8
-    sql_num = 8;
-
-    //线程池内的线程数量,默认8
-    thread_num = 8;
-
-    //关闭日志,默认不关闭
-    close_log = 0;
-
-    //并发模型,默认是proactor
-    actor_model = 0;
-
-    //需要修改的数据库信息,登录名,密码,库名
-    m_user = "root";
-    m_passwd = "123";
-    m_data_basename = "yourdb";
-
-    websiteRoot = "/home/chenranran/Program/hancy/website";
-}
-
+//端口号,默认9006
+int Config::PORT = 9006;
+//日志写入方式，默认同步
+int Config::LOGWrite = 0;
+//触发组合模式,默认listenfd LT + connfd LT
+int Config::TRIGMode = 0;
+//listenfd触发模式，默认LT
+int Config::LISTENTrigmode = 0;
+//connfd触发模式，默认LT
+int Config::CONNTrigmode = 0;
+//优雅关闭链接，默认不使用
+int Config::OPT_LINGER = 1;
+//数据库连接池数量,默认8
+int Config::sql_num = 8;
+//线程池内的线程数量,默认8
+int Config::thread_num = 8;
+//关闭日志,默认不关闭
+int Config::close_log = 0;
+//并发模型,默认是proactor
+int Config::actor_model = 0;
+//需要修改的数据库信息,登录名,密码,库名
+std::string Config::m_user = "root";
+std::string Config::m_passwd = "123";
+std::string Config::m_data_basename = "yourdb";
+std::string Config::websiteRoot = "/home/chenranran/Program/hancy/website";
+Config::Config(){}
 void Config::parse_arg(int argc, char*argv[]){
     int opt;
     const char *str = "p:l:m:o:s:t:c:a:";
@@ -48,42 +34,42 @@ void Config::parse_arg(int argc, char*argv[]){
         {
         case 'p':
         {
-            PORT = atoi(optarg);
+            Config::PORT = atoi(optarg);
             break;
         }
         case 'l':
         {
-            LOGWrite = atoi(optarg);
+            Config::LOGWrite = atoi(optarg);
             break;
         }
         case 'm':
         {
-            TRIGMode = atoi(optarg);
+            Config::TRIGMode = atoi(optarg);
             break;
         }
         case 'o':
         {
-            OPT_LINGER = atoi(optarg);
+            Config::OPT_LINGER = atoi(optarg);
             break;
         }
         case 's':
         {
-            sql_num = atoi(optarg);
+            Config::sql_num = atoi(optarg);
             break;
         }
         case 't':
         {
-            thread_num = atoi(optarg);
+            Config::thread_num = atoi(optarg);
             break;
         }
         case 'c':
         {
-            close_log = atoi(optarg);
+            Config::close_log = atoi(optarg);
             break;
         }
         case 'a':
         {
-            actor_model = atoi(optarg);
+            Config::actor_model = atoi(optarg);
             break;
         }
         default:
