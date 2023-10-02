@@ -42,7 +42,8 @@ hancy 是一个轻量的高性能服务器
 ```
 ## 支持
 支持config文件指定网站根目录   
-reactor/proactor + 线程池 + 数据库连接池 + LT/ET读取数据 + 异步日志系统 + 定时器 + 状态机解析http报文
+reactor/proactor + 线程池 + 数据库连接池 + LT/ET读取数据 + 异步日志系统 + 定时器 + 状态机解析http报文  
+文件上传前端使用form表格file控件发送post请求文件内容包含在body中(且使用base64编码)，后端解析并存储相关文件并通过权限判断来返回是否正确存储
 ## todo
 - [x] cmake构建工程
 - [x] 使用更为现代的cpp风格重构代码   

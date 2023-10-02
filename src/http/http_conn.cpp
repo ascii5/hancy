@@ -529,10 +529,43 @@ http_conn::HTTP_CODE http_conn::do_request()
     //文件上传功能实现
     else if(*(p + 1) == '9'){
         if(m_method == POST && m_content_length != 0){
-            // std::cout<<"break point"<<std::endl;
-            // std::cout<<m_string<<std::endl;
-            //std::string path(websiteRoot.c_str());
-
+            std::string path(Config::websiteRoot.c_str());
+            path.append("/upload");
+            std::string content(m_string);
+            LOG_INFO("%s",content.c_str());
+            std::size_t start = content.find("filename=\"");
+            if(start != std::string::npos){
+                start += 10;
+            }
+            std::size_t end =  content.find("\"",start);
+            std::string fileName = content.substr(start,end - start);
+            path.append("/");
+            path.append(fileName);
+            uploadFilePath = path;
+            std::string command("touch ");
+            command.append(path);
+            //std::cout<<command<<std::endl;
+            system(command.c_str());
+            
+            
+            
+            std::ofstream outFile(path,std::ofstream::binary | std::ofstream::trunc);
+            if(outFile.is_open()){
+                std::string fileContent;
+                fileContent = content.substr(end);
+                start = content.find("------WebKitFormBoundary");
+                end = content.find("\r\n",start + strlen("------WebKitFormBoundary"));
+                //std::cout<<start<<"    "<<end<<std::endl;
+                std::string separotor = content.substr(start,end - start);
+                //std::cout<<fileContent.find("\r\n")<<std::endl;
+                start = fileContent.find("\r\n\r\n") + strlen("\r\n\r\n");
+                end = fileContent.rfind(separotor.append("--").c_str());
+                fileContent = fileContent.substr(start,end - start-1);
+                //std::cout<<fileContent<<std::endl;
+                outFile.write(fileContent.c_str(),fileContent.size());
+                //outFile.write(content.c_str(),content.size());
+                outFile.close();
+            }
         }
         return FILE_UPLOAD;
     }
@@ -732,10 +765,19 @@ bool http_conn::process_write(HTTP_CODE ret)
     }
     case FILE_UPLOAD:
     {
+        struct stat uploadFileStat;
+        stat(uploadFilePath.c_str(),&uploadFileStat);
+
         add_status_line(200,ok_200_title);
-        const char* ok_string =  "<html><body>upload Error</body></html>";
-        add_headers(strlen(ok_string));
-        if(!add_content(ok_string))
+        const char* ok_string =  "<html><body>upload sucess</body></html>";
+        const char* error_string = "<html><body>upload error</body></html>";
+        const char* response_string;
+        if(S_ISDIR(uploadFileStat.st_mode) || !(uploadFileStat.st_mode & S_IROTH))
+            response_string = error_string;
+        else
+            response_string = ok_string;
+        add_headers(strlen(response_string));
+        if(!add_content(response_string))
             return false;
         break;
     }

@@ -23,11 +23,13 @@
 #include <string>
 #include <sstream>
 #include <errno.h>
+#include <fstream>
 
 #include "../lock/locker.h"
 #include "../CGImysql/sql_connection_pool.h"
 #include "../timer/lst_timer.h"
 #include "../log/log.h"
+#include "../config/config.h"
 
 class http_conn
 {
@@ -147,7 +149,7 @@ private:
     map<string, string> m_users;
     int m_TRIGMode;
     int m_close_log;
-
+    std::string uploadFilePath;
     char sql_user[100];
     char sql_passwd[100];
     char sql_name[100];
