@@ -444,7 +444,7 @@ http_conn::HTTP_CODE http_conn::do_request()
         {
             //如果是注册，先检测数据库中是否有重名的
             //没有重名的，进行增加数据
-            char *sql_insert = (char *)malloc(sizeof(char) * 200);
+            char *sql_insert = new char(200);
             strcpy(sql_insert, "INSERT INTO user(username, passwd) VALUES(");
             strcat(sql_insert, "'");
             strcat(sql_insert, name);
@@ -468,13 +468,27 @@ http_conn::HTTP_CODE http_conn::do_request()
             }
             else
                 strcpy(m_url, "/html/registerError.html");
+            free(sql_insert);
         }
         //如果是登录，直接判断
         //若浏览器端输入的用户名和密码在表中可以查找到，返回1，否则返回0
         else if (*(p + 1) == '2')
         {
-            if (users.find(name) != users.end() && users[name] == password)
+            if (users.find(name) != users.end() && users[name] == password){
                 strcpy(m_url, "/html/welcome.html");
+                std::string sql_select(R"(SELECT userId FROM user WHERE username = ')");
+                sql_select.append(name);
+                sql_select.append(R"(';)");
+                MYSQL_RES* res;
+                MYSQL_ROW row;
+
+                connectionRAII conn(&mysql,connection_pool::GetInstance());
+                mysql_query(mysql,sql_select.c_str());
+                res = mysql_use_result(mysql);
+                row = mysql_fetch_row(res);
+                userId = stoi(row[0]);
+                mysql_free_result(res);
+            }
             else
                 strcpy(m_url, "/html/logError.html");
         }
@@ -544,7 +558,6 @@ http_conn::HTTP_CODE http_conn::do_request()
             uploadFilePath = path;
             std::string command("touch ");
             command.append(path);
-            //std::cout<<command<<std::endl;
             system(command.c_str());
             
             
@@ -555,18 +568,29 @@ http_conn::HTTP_CODE http_conn::do_request()
                 fileContent = content.substr(end);
                 start = content.find("------WebKitFormBoundary");
                 end = content.find("\r\n",start + strlen("------WebKitFormBoundary"));
-                //std::cout<<start<<"    "<<end<<std::endl;
                 std::string separotor = content.substr(start,end - start);
-                //std::cout<<fileContent.find("\r\n")<<std::endl;
                 start = fileContent.find("\r\n\r\n") + strlen("\r\n\r\n");
                 end = fileContent.rfind(separotor.append("--").c_str());
                 fileContent = fileContent.substr(start,end - start-1);
-                //std::cout<<fileContent<<std::endl;
                 outFile.write(fileContent.c_str(),fileContent.size());
-                //outFile.write(content.c_str(),content.size());
                 outFile.close();
             }
-        }
+
+
+
+            //数据库增添指定文件信息
+            connectionRAII mySqlConn(&mysql,connection_pool::GetInstance());
+            std::string sql_insert(R"(INSERT INTO files (userId,filename) VALUES ()");
+            
+            sql_insert.append(to_string(userId).c_str());
+            sql_insert.append(R"(,)");
+            sql_insert.append(R"(")");
+            sql_insert.append(fileName.c_str());
+            sql_insert.append(R"(")");
+            sql_insert.append(R"();)");
+
+            mysql_query(mysql,sql_insert.c_str());
+        }   
         return FILE_UPLOAD;
     }
     else{

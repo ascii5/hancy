@@ -150,6 +150,7 @@ private:
     int m_TRIGMode;
     int m_close_log;
     std::string uploadFilePath;
+    int userId;
     char sql_user[100];
     char sql_passwd[100];
     char sql_name[100];
