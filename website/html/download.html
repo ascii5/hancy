@@ -32,29 +32,6 @@
 </head>
 <body>
     <h1>文件浏览器</h1>
-    <ul id="fileList"></ul>
-
-    <script>
-        // 服务器目录路径
-        var serverPath = '/path/to/server/directory/';
-
-        // 获取服务器目录下的文件列表
-        fetch(serverPath)
-            .then(response => response.json())
-            .then(data => {
-                var fileList = document.getElementById('fileList');
-                data.forEach(file => {
-                    var listItem = document.createElement('li');
-                    var link = document.createElement('a');
-                    link.href = serverPath + file;
-                    link.textContent = file;
-                    listItem.appendChild(link);
-                    fileList.appendChild(listItem);
-                });
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    </script>
+    <h2>download page</h2>
 </body>
 </html>

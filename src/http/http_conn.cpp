@@ -1,5 +1,4 @@
 #include "http_conn.h"
-
 #include <mysql/mysql.h>
 #include <fstream>
 
@@ -57,6 +56,7 @@ int setnonblocking(int fd)
 }
 
 //将内核事件表注册读事件，ET模式，选择开启EPOLLONESHOT
+//EPOLLONESHOT 在监听到事件发生，并有线程处理时，epoll事件删掉注册的epollfd
 void addfd(int epollfd, int fd, bool one_shot, int TRIGMode)
 {
     epoll_event event;
@@ -154,7 +154,8 @@ void http_conn::init()
     m_state = 0;
     timer_flag = 0;
     is_processed = 0;
-
+    userId = 0;
+    
     memset(m_read_buf, '\0', READ_BUFFER_SIZE);
     memset(m_write_buf, '\0', WRITE_BUFFER_SIZE);
     memset(m_real_file, '\0', FILENAME_LEN);
@@ -249,7 +250,6 @@ http_conn::HTTP_CODE http_conn::parse_request_line(char *text)
         return BAD_REQUEST;
     }
     *m_url++ = '\0';
-    
     
     //获取第一个字段method
     //仅支持GET,POST
@@ -543,6 +543,7 @@ http_conn::HTTP_CODE http_conn::do_request()
     //文件上传功能实现
     else if(*(p + 1) == '9'){
         if(m_method == POST && m_content_length != 0){
+            
             std::string path(Config::websiteRoot.c_str());
             path.append("/upload");
             std::string content(m_string);
@@ -553,45 +554,75 @@ http_conn::HTTP_CODE http_conn::do_request()
             }
             std::size_t end =  content.find("\"",start);
             std::string fileName = content.substr(start,end - start);
-            path.append("/");
-            path.append(fileName);
-            uploadFilePath = path;
-            std::string command("touch ");
-            command.append(path);
-            system(command.c_str());
-            
-            
-            
-            std::ofstream outFile(path,std::ofstream::binary | std::ofstream::trunc);
-            if(outFile.is_open()){
-                std::string fileContent;
-                fileContent = content.substr(end);
-                start = content.find("------WebKitFormBoundary");
-                end = content.find("\r\n",start + strlen("------WebKitFormBoundary"));
-                std::string separotor = content.substr(start,end - start);
-                start = fileContent.find("\r\n\r\n") + strlen("\r\n\r\n");
-                end = fileContent.rfind(separotor.append("--").c_str());
-                fileContent = fileContent.substr(start,end - start-1);
-                outFile.write(fileContent.c_str(),fileContent.size());
-                outFile.close();
-            }
 
 
-
-            //数据库增添指定文件信息
+            
             connectionRAII mySqlConn(&mysql,connection_pool::GetInstance());
-            std::string sql_insert(R"(INSERT INTO files (userId,filename) VALUES ()");
+            //判断是否存在同名文件
+            MYSQL_RES* res;
+            MYSQL_ROW row;
+            std::string sql_select(R"(SELECT fileName FROM files;)");
+            mysql_query(mysql,sql_select.c_str());
+            res = mysql_use_result(mysql);
+            bool isSameName = false;
+            while((row = mysql_fetch_row(res)) != NULL){
+                std::cout<<row[0]<<std::endl;
+                if(row[0] == fileName){
+                    isSameName = true;
+                }
+            }
+            //if(isSameName)
+                //std::cout<<"SameFileName"<<std::endl;
+            //数据库增添指定文件信息
+            if(!isSameName){
+                std::string sql_insert(R"(INSERT INTO files (userId,filename) VALUES ()");
             
-            sql_insert.append(to_string(userId).c_str());
-            sql_insert.append(R"(,)");
-            sql_insert.append(R"(")");
-            sql_insert.append(fileName.c_str());
-            sql_insert.append(R"(")");
-            sql_insert.append(R"();)");
+                sql_insert.append(to_string(userId).c_str());
+                sql_insert.append(R"(,)");
+                sql_insert.append(R"(")");
+                sql_insert.append(fileName.c_str());
+                sql_insert.append(R"(")");
+                sql_insert.append(R"();)");
 
-            mysql_query(mysql,sql_insert.c_str());
+                mysql_query(mysql,sql_insert.c_str());
+
+
+
+                path.append("/");
+                path.append(fileName);
+                uploadFilePath = path;
+                std::string command("touch ");
+                command.append(path);
+                system(command.c_str());
+                
+                
+                
+                std::ofstream outFile(path,std::ofstream::binary | std::ofstream::trunc);
+                if(outFile.is_open()){
+                    std::string fileContent;
+                    fileContent = content.substr(end);
+                    start = content.find("------WebKitFormBoundary");
+                    end = content.find("\r\n",start + strlen("------WebKitFormBoundary"));
+                    std::string separotor = content.substr(start,end - start);
+                    start = fileContent.find("\r\n\r\n") + strlen("\r\n\r\n");
+                    end = fileContent.rfind(separotor.append("--").c_str());
+                    fileContent = fileContent.substr(start,end - start-1);
+                    outFile.write(fileContent.c_str(),fileContent.size());
+                    outFile.close();
+                }
+            }
         }   
         return FILE_UPLOAD;
+    }
+    else if(*(p + 1) == 'a'){
+        char *m_url_real = (char*)malloc(sizeof(char)*200);
+        strcpy(m_url_real,"/html/download.html");
+        strncpy(m_real_file + len,m_url_real,strlen(m_url_real));
+        free(m_url_real);
+    }
+    else if(*(p + 1) == 'b'){
+    //返回json格式的文件列表
+        
     }
     else{
         strncpy(m_real_file + len, m_url, FILENAME_LEN - len - 1);   

@@ -3,20 +3,29 @@
     <head>
         <meta charset="UTF-8">
         <title>WebServer</title>
+        <style>
+            .buttonClass{
+                width: 100px;
+                height: 40px;
+            }
+        </style>
     </head>
     <body><br/><br/>
         <div align="center"><font size="5"> <strong>是时候做出选择了</strong></font></div><br/><br/>
             <form action="5" method="post">
-                <div align="center"><button type="submit">xxx.jpg</button></div>
+                <div align="center"><button type="submit" class="buttonClass">request for jpg file</button></div>
             </form><br/>
             <form action="6" method="post">
-                <div align="center"><button type="submit" >xxx.avi</button></div>
+                <div align="center"><button type="submit" class="buttonClass">request for avi file</button></div>
             </form><br/>
             <form action="8" method = "post">
-                <div align="center"><button type = "submit">ftpTest</button></div>
+                <div align="center"><button type = "submit"class="buttonClass">fileUpload</button></div>
+            </form><br/>
+            <form action="a" method = "post">
+                <div align="center"><button type="submit"class="buttonClass">fileDownload</button></div>
             </form><br/>
             <form action="7" method="post">
-                <div align="center"><button type="submit">关注我</button></div>
+                <div align="center"><button type="submit"class="buttonClass">fans</button></div>
             </form>
         </div>
     </body>
