@@ -23,6 +23,7 @@
 
 #include <time.h>
 #include "../log/log.h"
+#include "../http/http_conn.h"
 
 class util_timer;
 

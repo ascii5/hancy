@@ -436,6 +436,10 @@ void WebServer::eventLoop()
             }
             else if (events[i].events & (EPOLLRDHUP | EPOLLHUP | EPOLLERR))
             {
+                //EPOLLRDHUP 对端关闭连接
+                //EPOLLHUP 发生错误 连接异常中断
+                //EPOLLERR 发生错误事件
+                
                 //服务器端关闭连接，移除对应的定时器
                 //epoll中删除对应的sockfd,关闭对应的sockfd
                 util_timer *timer = users_timer[sockfd].timer;

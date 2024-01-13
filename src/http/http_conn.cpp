@@ -622,6 +622,8 @@ http_conn::HTTP_CODE http_conn::do_request()
     }
     else if(*(p + 1) == 'b'){
     //返回json格式的文件列表
+    //处理下载请求
+        
         
     }
     else{

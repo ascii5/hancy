@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>文件浏览器</title>
+    <title>file download page</title>
+    <meta charset="UTF-8">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -31,7 +32,36 @@
     </style>
 </head>
 <body>
-    <h1>文件浏览器</h1>
-    <h2>download page</h2>
+    <div class="container">
+        <h2>下载文件</h2>
+        <button type="button" onclick="getFile()">下载</button>
+        <script>
+            function getFile(){
+                //console.log("getFile");
+                var xhr = new XMLHttpRequest;
+                xhr.open("GET","b");
+                xhr.responseType = "blob";
+                xhr.onreadystatechange = function (){
+                    if(xhr.status === 200 && xhr.readyState === 4){
+                        console.log("get success");
+                        //本地化存储
+                        var blobData = xhr.response;
+                        var url = window.URL.createObjectURL(blobData);
+
+                        var a = document.createElement("a");
+                        a.href = url;
+                        a.download = "下载文件";
+
+                        document.appendChild(a);
+                        a.onclick();
+                        document.removeChild(a);
+
+                        window.URL.revokeObjectURL(url);
+                    }
+                }
+                xhr.send();
+            }
+        </script>
+    </div>
 </body>
 </html>
