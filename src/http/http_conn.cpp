@@ -1,6 +1,4 @@
 #include "http_conn.h"
-#include <mysql/mysql.h>
-#include <fstream>
 
 //定义http响应的一些状态信息
 const char *ok_200_title = "OK";
@@ -121,7 +119,7 @@ void http_conn::init(int sockfd, const sockaddr_in &addr, char *root, int TRIGMo
     m_user_count++;
 
     //当浏览器出现连接重置时，可能是网站根目录出错或http响应格式出错或者访问的文件中内容完全为空
-    doc_root = root;
+    m_website_root = root;
     m_TRIGMode = TRIGMode;
     m_close_log = close_log;
 
@@ -142,7 +140,7 @@ void http_conn::init()
     m_check_state = CHECK_STATE_REQUESTLINE;
     m_linger = false;
     m_method = GET;
-    m_url = 0;
+    m_request_url = 0;
     m_version = 0;
     m_content_length = 0;
     m_host = 0;
@@ -244,20 +242,20 @@ bool http_conn::read_once()
 http_conn::HTTP_CODE http_conn::parse_request_line(char *text)
 {
     //strbrk() 用于查找第一个字符串(参数1)中字符集合(参数2)任意字符的第一个位置
-    m_url = strpbrk(text, " \t");
-    if (!m_url)
+    m_request_url = strpbrk(text, " \t");
+    if (!m_request_url)
     {
         return BAD_REQUEST;
     }
-    *m_url++ = '\0';
+    *m_request_url++ = '\0';
     
     //获取第一个字段method
     //仅支持GET,POST
     //待支持HEAD,PUT,DELETE...
-    char *method = text;
-    if (strcasecmp(method, "GET") == 0)
+    char *m_request_method = text;
+    if (strcasecmp(m_request_method, "GET") == 0)
         m_method = GET;
-    else if (strcasecmp(method, "POST") == 0)
+    else if (strcasecmp(m_request_method, "POST") == 0)
     {
         m_method = POST;
         cgi = 1;
@@ -268,34 +266,34 @@ http_conn::HTTP_CODE http_conn::parse_request_line(char *text)
     //strspn() 用于计算一个字符串(参数1)中连续包含另一个字符串(参数2)中指定字符集合的字符的长度。
     //这里的作用是跳过可能存在的空格和/t
     //strbrk() 用于查找第一个字符串(参数1)中字符集合(参数2)任意字符的第一个位置
-    m_url += strspn(m_url, " \t");
-    m_version = strpbrk(m_url, " \t");
+    m_request_url += strspn(m_request_url, " \t");
+    m_version = strpbrk(m_request_url, " \t");
     if (!m_version)
         return BAD_REQUEST;
     *m_version++ = '\0';
     m_version += strspn(m_version, " \t");
     if (strcasecmp(m_version, "HTTP/1.1") != 0)
         return BAD_REQUEST;
-    if (strncasecmp(m_url, "http://", 7) == 0)
+    if (strncasecmp(m_request_url, "http://", 7) == 0)
     {
-        m_url += 7;
+        m_request_url += 7;
         //strchr查找指定字符的第一个出现位置
         //即去掉域名的文件路径
-        m_url = strchr(m_url, '/');
+        m_request_url = strchr(m_request_url, '/');
     }
 
-    if (strncasecmp(m_url, "https://", 8) == 0)
+    if (strncasecmp(m_request_url, "https://", 8) == 0)
     {
-        m_url += 8;
-        m_url = strchr(m_url, '/');
+        m_request_url += 8;
+        m_request_url = strchr(m_request_url, '/');
     }
 
-    if (!m_url || m_url[0] != '/')
+    if (!m_request_url || m_request_url[0] != '/')
         return BAD_REQUEST;
     //当url为/时，显示判断界面
     //默认为judge页面
-    if (strlen(m_url) == 1)
-        strcat(m_url, "index.html");
+    if (strlen(m_request_url) == 1)
+        strcat(m_request_url, "index.html");
     //主状态机改变
     m_check_state = CHECK_STATE_HEADER;
     return NO_REQUEST;
@@ -348,7 +346,7 @@ http_conn::HTTP_CODE http_conn::parse_content(char *text)
     {
         text[m_content_length] = '\0';
         //POST请求中最后为输入的用户名和密码
-        m_string = text;
+        m_content = text;
         return GET_REQUEST;
     }
     return NO_REQUEST;
@@ -408,22 +406,22 @@ http_conn::HTTP_CODE http_conn::process_read()
 
 http_conn::HTTP_CODE http_conn::do_request()
 {
-    //doc_root = root(网站根目录)
-    strcpy(m_real_file, doc_root);
-    int len = strlen(doc_root);
-    //printf("m_url:%s\n", m_url);
-    const char *p = strrchr(m_url, '/');
+    //m_website_root = root(网站根目录)
+    strcpy(m_real_file, m_website_root);
+    int len = strlen(m_website_root);
+    //printf("m_request_url:%s\n", m_request_url);
+    const char *p = strrchr(m_request_url, '/');
     //post请求设置cgi位
     //处理cgi
     if (cgi == 1 && (*(p + 1) == '2' || *(p + 1) == '3'))
     {
 
         //根据标志判断是登录检测还是注册检测
-        char flag = m_url[1];
+        char flag = m_request_url[1];
 
         char *m_url_real = (char *)malloc(sizeof(char) * 200);
         strcpy(m_url_real, "/");
-        strcat(m_url_real, m_url + 2);
+        strcat(m_url_real, m_request_url + 2);
         strncpy(m_real_file + len, m_url_real, FILENAME_LEN - len - 1);
         free(m_url_real);
         //cout<<m_real_file<<endl;
@@ -431,13 +429,13 @@ http_conn::HTTP_CODE http_conn::do_request()
         //user=123&passwd=123
         char name[100], password[100];
         int i;
-        for (i = 5; m_string[i] != '&'; ++i)
-            name[i - 5] = m_string[i];
+        for (i = 5; m_content[i] != '&'; ++i)
+            name[i - 5] = m_content[i];
         name[i - 5] = '\0';
 
         int j = 0;
-        for (i = i + 10; m_string[i] != '\0'; ++i, ++j)
-            password[j] = m_string[i];
+        for (i = i + 10; m_content[i] != '\0'; ++i, ++j)
+            password[j] = m_content[i];
         password[j] = '\0';
 
         if (*(p + 1) == '3')
@@ -462,12 +460,12 @@ http_conn::HTTP_CODE http_conn::do_request()
                 m_lock.unlock();
 
                 if (!res)
-                    strcpy(m_url, "/html/log.html");
+                    strcpy(m_request_url, "/html/log.html");
                 else
-                    strcpy(m_url, "/html/registerError.html");
+                    strcpy(m_request_url, "/html/registerError.html");
             }
             else
-                strcpy(m_url, "/html/registerError.html");
+                strcpy(m_request_url, "/html/registerError.html");
             free(sql_insert);
         }
         //如果是登录，直接判断
@@ -475,7 +473,7 @@ http_conn::HTTP_CODE http_conn::do_request()
         else if (*(p + 1) == '2')
         {
             if (users.find(name) != users.end() && users[name] == password){
-                strcpy(m_url, "/html/welcome.html");
+                strcpy(m_request_url, "/html/welcome.html");
                 std::string sql_select(R"(SELECT userId FROM user WHERE username = ')");
                 sql_select.append(name);
                 sql_select.append(R"(';)");
@@ -490,7 +488,7 @@ http_conn::HTTP_CODE http_conn::do_request()
                 mysql_free_result(res);
             }
             else
-                strcpy(m_url, "/html/logError.html");
+                strcpy(m_request_url, "/html/logError.html");
         }
     }
 
@@ -546,7 +544,7 @@ http_conn::HTTP_CODE http_conn::do_request()
             
             std::string path(Config::websiteRoot.c_str());
             path.append("/upload");
-            std::string content(m_string);
+            std::string content(m_content);
             LOG_INFO("%s",content.c_str());
             std::size_t start = content.find("filename=\"");
             if(start != std::string::npos){
@@ -566,7 +564,7 @@ http_conn::HTTP_CODE http_conn::do_request()
             res = mysql_use_result(mysql);
             bool isSameName = false;
             while((row = mysql_fetch_row(res)) != NULL){
-                std::cout<<row[0]<<std::endl;
+                //std::cout<<row[0]<<std::endl;
                 if(row[0] == fileName){
                     isSameName = true;
                 }
@@ -623,11 +621,10 @@ http_conn::HTTP_CODE http_conn::do_request()
     else if(*(p + 1) == 'b'){
     //返回json格式的文件列表
     //处理下载请求
-        
-        
+        return FILE_DOWNLOAD;
     }
     else{
-        strncpy(m_real_file + len, m_url, FILENAME_LEN - len - 1);   
+        strncpy(m_real_file + len, m_request_url, FILENAME_LEN - len - 1);   
     }
 
     //stat() 用于获取文件的属性存储在stat结构体里面
@@ -768,85 +765,122 @@ bool http_conn::add_content(const char *content)
 {
     return add_response("%s", content);
 }
+
 bool http_conn::process_write(HTTP_CODE ret)
 {
-    //cout<<ret<<endl;
+
     switch (ret)
     {
-    case INTERNAL_ERROR:
-    {
-        add_status_line(500, error_500_title);
-        add_headers(strlen(error_500_form));
-        if (!add_content(error_500_form))
-            return false;
-        break;
-    }
-    case BAD_REQUEST:
-    {
-        add_status_line(404, error_404_title);
-        add_headers(strlen(error_404_form));
-        if (!add_content(error_404_form)){
-            return false;
-        }
-        break;
-    }
-    case FORBIDDEN_REQUEST:
-    {
-        add_status_line(403, error_403_title);
-        add_headers(strlen(error_403_form));
-        if (!add_content(error_403_form))
-            return false;
-        break;
-    }
-    case FILE_REQUEST:
-    {
-        add_status_line(200, ok_200_title);
-        if (m_file_stat.st_size != 0)
+        case INTERNAL_ERROR:
         {
-            add_headers(m_file_stat.st_size);
-            m_iv[0].iov_base = m_write_buf;
-            m_iv[0].iov_len = m_write_idx;
-            m_iv[1].iov_base = m_file_address;
-            m_iv[1].iov_len = m_file_stat.st_size;
-            m_iv_count = 2;
-            bytes_to_send = m_write_idx + m_file_stat.st_size;
-            return true;
-        }
-        else
-        {
-            const char *ok_string = "<html><body></body></html>";
-            add_headers(strlen(ok_string));
-            if (!add_content(ok_string))
+            add_status_line(500, error_500_title);
+            add_headers(strlen(error_500_form));
+            if (!add_content(error_500_form))
                 return false;
+            break;
         }
-    }
-    case FILE_UPLOAD:
-    {
-        struct stat uploadFileStat;
-        stat(uploadFilePath.c_str(),&uploadFileStat);
+        case BAD_REQUEST:
+        {
+            add_status_line(404, error_404_title);
+            add_headers(strlen(error_404_form));
+            if (!add_content(error_404_form)){
+                return false;
+            }
+            break;
+        }
+        case FORBIDDEN_REQUEST:
+        {
+            add_status_line(403, error_403_title);
+            add_headers(strlen(error_403_form));
+            if (!add_content(error_403_form))
+                return false;
+            break;
+        }
+        case FILE_REQUEST:
+        {
+            add_status_line(200, ok_200_title);
+            if (m_file_stat.st_size != 0)
+            {
+                add_headers(m_file_stat.st_size);
+                m_iv[0].iov_base = m_write_buf;
+                m_iv[0].iov_len = m_write_idx;
+                m_iv[1].iov_base = m_file_address;
+                m_iv[1].iov_len = m_file_stat.st_size;
+                m_iv_count = 2;
+                bytes_to_send = m_write_idx + m_file_stat.st_size;
+                return true;
+            }
+            else
+            {
+                const char *ok_string = "<html><body></body></html>";
+                add_headers(strlen(ok_string));
+                if (!add_content(ok_string))
+                    return false;
+            }
+        }
+        case FILE_UPLOAD:
+        {
+            struct stat uploadFileStat;
+            stat(uploadFilePath.c_str(),&uploadFileStat);
 
-        add_status_line(200,ok_200_title);
-        const char* ok_string =  "<html><body>upload sucess</body></html>";
-        const char* error_string = "<html><body>upload error</body></html>";
-        const char* response_string;
-        if(S_ISDIR(uploadFileStat.st_mode) || !(uploadFileStat.st_mode & S_IROTH))
-            response_string = error_string;
-        else
-            response_string = ok_string;
-        add_headers(strlen(response_string));
-        if(!add_content(response_string))
+            add_status_line(200,ok_200_title);
+            const char* ok_string =  "<html><body>upload sucess</body></html>";
+            const char* error_string = "<html><body>upload error</body></html>";
+            const char* response_string;
+            if(S_ISDIR(uploadFileStat.st_mode) || !(uploadFileStat.st_mode & S_IROTH))
+                response_string = error_string;
+            else
+                response_string = ok_string;
+            add_headers(strlen(response_string));
+            if(!add_content(response_string))
+                return false;
+            break;
+        }
+        case FILE_DOWNLOAD:
+        {
+            
+            std::ifstream downloadFile(string(m_website_root).append("/upload/test.txt"));
+
+
+            if(downloadFile.is_open()){
+
+                std::string downloadFileContent;
+                std::string temp;
+
+
+                while(std::getline(downloadFile,temp)){
+                    downloadFileContent.append(temp);
+                }
+
+                downloadFile.close();
+                
+                
+                add_status_line(200,ok_200_title);
+                add_headers(downloadFileContent.size());
+                if(!add_content(downloadFileContent.c_str())){
+                    return false;
+                }
+            }
+            else{
+                add_status_line(500,error_500_title);
+                add_headers(strlen(error_500_form));
+                if(!add_content(error_500_form)){
+                    return false;
+                }
+            }
+            break;
+        }
+        default:
             return false;
-        break;
     }
-    default:
-        return false;
-    }
+    
     m_iv[0].iov_base = m_write_buf;
     m_iv[0].iov_len = m_write_idx;
     m_iv_count = 1;
     bytes_to_send = m_write_idx;
     return true;
 }
+
 void http_conn::process()
 {
     //process_read() 读取(从缓冲区)并判断请求页面(设置m_url)

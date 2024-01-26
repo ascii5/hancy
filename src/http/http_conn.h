@@ -24,6 +24,8 @@
 #include <sstream>
 #include <errno.h>
 #include <fstream>
+#include <mysql/mysql.h>
+#include <fstream>
 
 #include "../lock/locker.h"
 #include "../CGImysql/sql_connection_pool.h"
@@ -131,7 +133,7 @@ private:
     CHECK_STATE m_check_state;
     METHOD m_method;
     char m_real_file[FILENAME_LEN];
-    char *m_url;
+    char *m_request_url;
     char *m_version;
     char *m_host;
     long m_content_length;
@@ -141,10 +143,10 @@ private:
     struct iovec m_iv[2];
     int m_iv_count;
     int cgi;        //是否启用的POST
-    char *m_string; //存储请求头数据
+    char *m_content; //存储请求头数据
     int bytes_to_send;
     int bytes_have_send;
-    char *doc_root;
+    char *m_website_root;
 
     map<string, string> m_users;
     int m_TRIGMode;
