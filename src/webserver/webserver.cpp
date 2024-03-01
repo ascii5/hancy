@@ -186,7 +186,7 @@ void WebServer::timer(int connfd, struct sockaddr_in client_address)
     //创建定时器，设置回调函数和超时时间，绑定用户数据，将定时器添加到链表中
     users_timer[connfd].address = client_address;
     users_timer[connfd].sockfd = connfd;
-    util_timer *timer = new util_timer;
+    util_timer* timer = new util_timer;
     timer->user_data = &users_timer[connfd];
     //cb_func() epoll内核删除sockfd, 关闭对应的sockfd
     timer->cb_func = cb_func;
@@ -194,9 +194,11 @@ void WebServer::timer(int connfd, struct sockaddr_in client_address)
     //设置定时器的时间(绝对时间)
     time_t cur = time(NULL);
     timer->expire = cur + 3 * TIMESLOT;
-   
+    timer->id = connfd;
     users_timer[connfd].timer = timer;
-    utils.m_timer_lst.add_timer(timer);
+    utils.u_heapTimer.addTimer(timer);
+
+    //delete timer;
 }
 
 //若有数据传输，则将定时器往后延迟3个单位
@@ -205,7 +207,7 @@ void WebServer::adjust_timer(util_timer *timer)
 {
     time_t cur = time(NULL);
     timer->expire = cur + 3 * TIMESLOT;
-    utils.m_timer_lst.adjust_timer(timer);
+    utils.u_heapTimer.adjust(timer);
 
     LOG_INFO("%s", "adjust timer once");
 }
@@ -216,7 +218,7 @@ void WebServer::deal_timer(util_timer *timer, int sockfd)
     timer->cb_func(&users_timer[sockfd]);
     if (timer)
     {
-        utils.m_timer_lst.del_timer(timer);
+        utils.u_heapTimer.delTimer(timer);
     }
 
     LOG_INFO("close fd %d", users_timer[sockfd].sockfd);
@@ -410,7 +412,7 @@ void WebServer::eventLoop()
 {
     bool timeout = false;
     bool stop_server = false;
- 
+  
  
     //统一事件源
     while (!stop_server)

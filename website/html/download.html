@@ -29,11 +29,29 @@
         a:hover {
             text-decoration: underline;
         }
+
+        h2 {
+            text-align: center;
+        }
+
+        button {
+            width: 100px;
+            height: 50px;
+            text-align: center;
+            left: 50%;
+            top: 50%;
+        }
+
+        div {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>下载文件</h2>
+        <h2 >下载文件</h2>
         <button type="button" onclick="getFile()">下载</button>
         <script>
             function getFile(){
@@ -54,7 +72,7 @@
                         var a = document.createElement("a");
                         
                         a.href = url;
-                        a.download = "下载文件"
+                        a.download = "test"
                         
                         document.body.appendChild(a);
                         a.click();

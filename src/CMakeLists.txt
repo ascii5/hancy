@@ -14,8 +14,8 @@ PUBLIC
     ./log/log.cpp
     ./CGImysql/sql_connection_pool.h
     ./CGImysql/sql_connection_pool.cpp
-    ./timer/lst_timer.h
-    ./timer/lst_timer.cpp
+    ./timer/heapTimer.h
+    ./timer/heapTimer.cpp
     ./http/http_conn.h
     ./http/http_conn.cpp
     ./threadpool/threadpool.h
