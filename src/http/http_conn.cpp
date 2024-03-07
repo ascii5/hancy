@@ -14,6 +14,29 @@ const char *error_500_form = "There was an unusual problem serving the request f
 locker m_lock;
 map<string, string> users;
 
+void http_conn::setHeaders(){
+    auto it = m_headers.find("Connection");
+
+    if(it != m_headers.end()){
+        if(m_headers["Connection"] == "keep-alive")
+            m_linger = true;
+    }
+    it = m_headers.find("Content-Length");
+    if(it != m_headers.end()){
+        //std::cout<<m_headers["Content-Length"]<<std::endl;
+        m_content_length = std::stoi(m_headers["Content-Length"]);
+    }
+    //std::cout<<m_content_length<<std::endl;
+    it = m_headers.find("Host");
+    if(it != m_headers.end()){
+        
+        m_host = new char[m_headers["Host"].size()+1];
+        std::strcpy(m_host,m_headers["Host"].c_str());
+    }
+
+    m_headers.clear();
+}
+
 void http_conn::initmysql_result(connection_pool *connPool)
 {
     //先从连接池中取一个连接
@@ -241,102 +264,114 @@ bool http_conn::read_once()
 //解析http请求行，获得请求方法，目标url及http版本号
 http_conn::HTTP_CODE http_conn::parse_request_line(char *text)
 {
-    //strbrk() 用于查找第一个字符串(参数1)中字符集合(参数2)任意字符的第一个位置
-    m_request_url = strpbrk(text, " \t");
-    if (!m_request_url)
-    {
-        return BAD_REQUEST;
+    std::string requestLine(text);
+    regex patten("^([^ ]*) ([^ ]*) HTTP/([^ ]*)$");
+    smatch submatch;
+    if(regex_match(requestLine,submatch,patten)){
+        std::string stringMethod = submatch[1];
+        std::string stringUrl = submatch[2];
+        std::string stringVersion = submatch[3];
+
+
+        if(stringMethod.compare(string("GET")) == 0){
+            m_method = GET;
+        }
+        else if(stringMethod.compare(string("POST")) == 0){
+            m_method = POST;
+            cgi = 1;
+        }
+        else{
+            return BAD_REQUEST;
+        }
+
+        //LOG_DEBUG("m_version compelete");
+        size_t pos = stringUrl.rfind('/');
+        stringUrl = stringUrl.substr(pos);
+        //LOG_DEBUG("%s",stringUrl.c_str());
+        if(m_request_url != nullptr){
+            delete []m_request_url;
+        }
+        m_request_url = new char[stringUrl.length()+1];
+        strcpy(m_request_url,stringUrl.c_str());
+        m_request_url[stringUrl.length()+1] = '\0';
+        //std::cout<<stringUrl.length()<<"   "<<strlen(m_request_url)
+        //LOG_DEBUG("m_request_url complete");
+
+        if(stringVersion.compare("1.1") != 0){
+            //std::cout<<<<std::endl;
+            return BAD_REQUEST;
+        }
+
+        if(strlen(m_request_url) == 1){
+            strcat(m_request_url,"index.html");
+        }
+
+        m_check_state = CHECK_STATE_HEADER;
+        
+        return NO_REQUEST;
     }
-    *m_request_url++ = '\0';
+    return BAD_REQUEST;
     
-    //获取第一个字段method
-    //仅支持GET,POST
-    //待支持HEAD,PUT,DELETE...
-    char *m_request_method = text;
-    if (strcasecmp(m_request_method, "GET") == 0)
-        m_method = GET;
-    else if (strcasecmp(m_request_method, "POST") == 0)
-    {
-        m_method = POST;
-        cgi = 1;
-    }
-    else
-        return BAD_REQUEST;
-
-    //strspn() 用于计算一个字符串(参数1)中连续包含另一个字符串(参数2)中指定字符集合的字符的长度。
-    //这里的作用是跳过可能存在的空格和/t
-    //strbrk() 用于查找第一个字符串(参数1)中字符集合(参数2)任意字符的第一个位置
-    m_request_url += strspn(m_request_url, " \t");
-    m_version = strpbrk(m_request_url, " \t");
-    if (!m_version)
-        return BAD_REQUEST;
-    *m_version++ = '\0';
-    m_version += strspn(m_version, " \t");
-    if (strcasecmp(m_version, "HTTP/1.1") != 0)
-        return BAD_REQUEST;
-    if (strncasecmp(m_request_url, "http://", 7) == 0)
-    {
-        m_request_url += 7;
-        //strchr查找指定字符的第一个出现位置
-        //即去掉域名的文件路径
-        m_request_url = strchr(m_request_url, '/');
-    }
-
-    if (strncasecmp(m_request_url, "https://", 8) == 0)
-    {
-        m_request_url += 8;
-        m_request_url = strchr(m_request_url, '/');
-    }
-
-    if (!m_request_url || m_request_url[0] != '/')
-        return BAD_REQUEST;
-    //当url为/时，显示判断界面
-    //默认为judge页面
-    if (strlen(m_request_url) == 1)
-        strcat(m_request_url, "index.html");
-    //主状态机改变
-    m_check_state = CHECK_STATE_HEADER;
-    return NO_REQUEST;
 }
+
 //解析http请求的一个头部信息
 http_conn::HTTP_CODE http_conn::parse_headers(char *text)
 {
-    if (text[0] == '\0')
-    {
-        if (m_content_length != 0)
-        {
+    std::string line(text);
+    regex patten("^([^:]*): ?(.*)$");
+    smatch subMatch;
+    
+    if(regex_match(line,subMatch,patten)){
+        m_headers[subMatch[1]] = subMatch[2];
+        //std::cout<<subMatch[1]<<" "<<subMatch[2]<<std::endl;
+    }
+    else{
+        setHeaders();
+        
+        if(m_content_length != 0){
             m_check_state = CHECK_STATE_CONTENT;
             return NO_REQUEST;
         }
         return GET_REQUEST;
     }
-    //仅支持部分头部字段的解析
-    else if (strncasecmp(text, "Connection:", 11) == 0)
-    {
-        text += 11;
-        text += strspn(text, " \t");
-        if (strcasecmp(text, "keep-alive") == 0)
-        {
-            m_linger = true;
-        }
-    }
-    else if (strncasecmp(text, "Content-length:", 15) == 0)
-    {
-        text += 15;
-        text += strspn(text, " \t");
-        m_content_length = atol(text);
-    }
-    else if (strncasecmp(text, "Host:", 5) == 0)
-    {
-        text += 5;
-        text += strspn(text, " \t");
-        m_host = text;
-    }
-    else
-    {
-        LOG_INFO("oop!unknow header: %s", text);
-    }
     return NO_REQUEST;
+    // if (text[0] == '\0')
+    // {
+    //     if (m_content_length != 0)
+    //     {
+    //         m_check_state = CHECK_STATE_CONTENT;
+    //         return NO_REQUEST;
+    //     }
+    //     return GET_REQUEST;
+    // }
+    // //仅支持部分头部字段的解析
+    // else if (strncasecmp(text, "Connection:", 11) == 0)
+    // {
+    //     text += 11;
+    //     text += strspn(text, " \t");
+    //     if (strcasecmp(text, "keep-alive") == 0)
+    //     {
+    //         m_linger = true;
+    //     }
+    // }
+    // else if (strncasecmp(text, "Content-length:", 15) == 0)
+    // {
+    //     text += 15;
+    //     text += strspn(text, " \t");
+    //     m_content_length = atol(text);
+    // }
+    // else if (strncasecmp(text, "Host:", 5) == 0)
+    // {
+    //     text += 5;
+    //     text += strspn(text, " \t");
+    //     m_host = text;
+    // }
+    // else
+    // {
+    //     LOG_INFO("oop!unknow header: %s", text);
+    // }
+    
+    // return NO_REQUEST;
 }
 
 //判断http请求是否被完整读入
@@ -369,7 +404,9 @@ http_conn::HTTP_CODE http_conn::process_read()
             //解析请求行
             case CHECK_STATE_REQUESTLINE:
             {
+                m_content_length = 0;
                 ret = parse_request_line(text);
+                //std::cout<<"parse_request_line() compelete"<<std::endl;
                 if (ret == BAD_REQUEST)
                     return BAD_REQUEST;
                 break;
@@ -378,7 +415,14 @@ http_conn::HTTP_CODE http_conn::process_read()
             {
                 //解析单个头部信息，解析完成后进行判断是否存在content
                 //get请求直接调用do_request进行处理，否则解析content
+                //setHeaders();
+                
                 ret = parse_headers(text);
+                //std::cout<<m_request_url<<std::endl;
+                // if(ret == GET_REQUEST){
+                //     std::cout<<"GET_REQUEST"<<std::endl;
+                // }
+                //std::cout<<ret<<std::endl;
                 if (ret == BAD_REQUEST)
                     return BAD_REQUEST;
                 else if (ret == GET_REQUEST)
@@ -612,18 +656,19 @@ http_conn::HTTP_CODE http_conn::do_request()
         }   
         return FILE_UPLOAD;
     }
-    else if(*(p + 1) == 'a'){
+    else if(*(p + 1) == 'a' && *(p+2) == '\0'){
         char *m_url_real = (char*)malloc(sizeof(char)*200);
         strcpy(m_url_real,"/html/download.html");
         strncpy(m_real_file + len,m_url_real,strlen(m_url_real));
         free(m_url_real);
     }
-    else if(*(p + 1) == 'b'){
+    else if(*(p + 1) == 'b' && *(p+2) == '\0'){
     //返回json格式的文件列表
     //处理下载请求
         return FILE_DOWNLOAD;
     }
     else{
+       
         strncpy(m_real_file + len, m_request_url, FILENAME_LEN - len - 1);   
     }
 
@@ -885,7 +930,7 @@ void http_conn::process()
 {
     //process_read() 读取(从缓冲区)并判断请求页面(设置m_url)
     HTTP_CODE read_ret = process_read();
-    //NO_REQUEST 请求不完整，需要继续请求报文数据
+    
     if (read_ret == NO_REQUEST)
     {
         //监听读事件
@@ -893,7 +938,7 @@ void http_conn::process()
         return;
     }
     bool write_ret = process_write(read_ret);
-    //cout<<"write_ret:%d"<<write_ret<<endl;
+    
     if (!write_ret)
     {
         close_conn();

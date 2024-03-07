@@ -8,6 +8,7 @@ int main(int argc, char *argv[])
     WebServer server;
     
     server.WebServerPrepare();
+    
     server.eventLoop();
 
     return 0;

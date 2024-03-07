@@ -26,6 +26,7 @@
 #include <fstream>
 #include <mysql/mysql.h>
 #include <fstream>
+#include <regex>
 
 #include "../lock/locker.h"
 #include "../CGImysql/sql_connection_pool.h"
@@ -79,7 +80,7 @@ public:
 
 public:
     http_conn() {}
-    ~http_conn() {}
+    ~http_conn() {delete m_host;}
 
 public:
     void init(int sockfd, const sockaddr_in &addr, char * root, int TRGIMode, int close_log, string user, string passwd, string sqlname);
@@ -114,7 +115,7 @@ private:
     bool add_content_length(int content_length);
     bool add_linger();
     bool add_blank_line();
-
+    void setHeaders();
 public:
     static int m_epollfd;
     static int m_user_count;
@@ -156,6 +157,8 @@ private:
     char sql_user[100];
     char sql_passwd[100];
     char sql_name[100];
+
+    std::map<std::string,std::string> m_headers;
 };
 
 #endif

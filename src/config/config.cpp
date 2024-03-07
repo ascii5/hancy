@@ -2,7 +2,7 @@
 //端口号,默认9006
 int Config::PORT = 9006;
 //日志写入方式，默认同步
-int Config::LOGWrite = 0;
+int Config::LOGWrite = 1;
 //触发组合模式,默认listenfd LT + connfd LT
 int Config::TRIGMode = 0;
 //listenfd触发模式，默认LT

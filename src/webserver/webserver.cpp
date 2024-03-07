@@ -39,6 +39,7 @@ WebServer::~WebServer()
 
 void WebServer::WebServerPrepare(){
     this -> log_write();
+    LOG_DEBUG("%d",m_log_write);
     this -> sql_pool();
     this -> thread_pool();
     this -> trig_mode();

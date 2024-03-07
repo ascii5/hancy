@@ -9,26 +9,10 @@ void heapTimer::delTimer(util_timer* timer){
 void heapTimer::printTimerExpire(){
     assert(!heap_.empty());
     std::time_t timeNow = std::time(nullptr);
-    // for(int i = 0;i < heap_.size();++i){
-    //     std::cout<<heap_[i].id<<std::endl;
-    // }
-    // std::cout<<std::endl;
-    // std::cout<<std::endl;
-    // std::cout<<std::endl;
-    // std::cout<<std::endl;
-    //int flag = 0;
+
     while(!heap_.empty()){
         util_timer timer = heap_.front();
         std::cout<<"timer id:   "<<timer.id<<"timer expire:   "<<timer.expire - timeNow<<std::endl;
-        // if(flag == 1){
-        //     std::cout<<std::endl;
-        //     std::cout<<std::endl;
-        //     for(int i = 0;i < heap_.size();++i){
-        //         std::cout<<"timer id:  "<<heap_[i].id<<std::endl;
-        //     }
-        //     std::cout<<std::endl;
-        //     std::cout<<std::endl;
-        // }
         pop();
         flag++;
     }
@@ -59,12 +43,7 @@ int heapTimer::GetNextTick(){
 void heapTimer::adjust(util_timer* timer){
     /* 调整指定id的结点 */
     addTimer(timer);
-    //assert(!heap_.empty());
-    // if(ref_.count(timer->id) == 0){
-    //     addTimer(timer);
-    // }
-    // assert(ref_.count(timer->id) > 0);
-    // shiftDown_(ref_[timer->id],heap_.size());
+    
 }
 
 void heapTimer::doWork(int id){
@@ -86,27 +65,13 @@ void heapTimer::del_(size_t i){
     
     int j = heap_.size() - 1;
     
-    // if(flag == 1){
-    //     for(int i = 0;i < heap_.size();++i)
-    //         std::cout<<"timer id:"<<heap_[i].id<<std::endl;
-    // }
-
-    // std::cout<<std::endl;
-    // std::cout<<std::endl;
-    // std::cout<<std::endl;
-    // std::cout<<std::endl;
     if(i < j){
         swapNode_(i,j);
         if(!shiftDown_(i,heap_.size()-1)){
             shiftUp_(i);
         }
     }
-    // if(flag == 1){
-    //     for(int i = 0;i < heap_.size();++i)
-    //         std::cout<<"timer id:"<<heap_[i].id<<std::endl;
-    // }
-    //std::cout<<"heap_ pop() element id:   "<<heap_.back().id<<std::endl;
-    
+   
     ref_.erase(heap_.back().id);
     heap_.pop_back();
 }
