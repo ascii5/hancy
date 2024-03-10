@@ -535,7 +535,7 @@ http_conn::HTTP_CODE http_conn::do_request()
                 strcpy(m_request_url, "/html/logError.html");
         }
         strncpy(m_real_file + len,m_request_url,FILENAME_LEN - len - 1);
-        std::cout<<m_real_file<<std::endl;
+        //std::cout<<m_real_file<<std::endl;
     }
     else if (*(p + 1) == '0'&& *(p+2) == '\0')
     {
