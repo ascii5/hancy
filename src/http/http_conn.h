@@ -80,7 +80,7 @@ public:
 
 public:
     http_conn() {}
-    ~http_conn() {delete m_host;}
+    ~http_conn() {delete m_host;memset(m_real_file,'\0',sizeof(m_real_file));}
 
 public:
     void init(int sockfd, const sockaddr_in &addr, char * root, int TRGIMode, int close_log, string user, string passwd, string sqlname);

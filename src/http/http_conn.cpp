@@ -534,9 +534,10 @@ http_conn::HTTP_CODE http_conn::do_request()
             else
                 strcpy(m_request_url, "/html/logError.html");
         }
+        strncpy(m_real_file + len,m_request_url,FILENAME_LEN - len - 1);
+        std::cout<<m_real_file<<std::endl;
     }
-
-    if (*(p + 1) == '0')
+    else if (*(p + 1) == '0'&& *(p+2) == '\0')
     {
         char *m_url_real = (char *)malloc(sizeof(char) * 200);
         strcpy(m_url_real, "/html/register.html");
@@ -544,7 +545,7 @@ http_conn::HTTP_CODE http_conn::do_request()
 
         free(m_url_real);
     }
-    else if (*(p + 1) == '1')
+    else if (*(p + 1) == '1'&& *(p+2) == '\0')
     {
         char *m_url_real = (char *)malloc(sizeof(char) * 200);
         strcpy(m_url_real, "/html/log.html");
@@ -552,7 +553,7 @@ http_conn::HTTP_CODE http_conn::do_request()
 
         free(m_url_real);
     }
-    else if (*(p + 1) == '5')
+    else if (*(p + 1) == '5'&& *(p+2) == '\0')
     {
         char *m_url_real = (char *)malloc(sizeof(char) * 200);
         strcpy(m_url_real, "/html/picture.html");
@@ -560,7 +561,7 @@ http_conn::HTTP_CODE http_conn::do_request()
 
         free(m_url_real);
     }
-    else if (*(p + 1) == '6')
+    else if (*(p + 1) == '6'&& *(p+2) == '\0')
     {
         char *m_url_real = (char *)malloc(sizeof(char) * 200);
         strcpy(m_url_real, "/html/video.html");
@@ -568,7 +569,7 @@ http_conn::HTTP_CODE http_conn::do_request()
 
         free(m_url_real);
     }
-    else if (*(p + 1) == '7')
+    else if (*(p + 1) == '7'&& *(p+2) == '\0')
     {
         char *m_url_real = (char *)malloc(sizeof(char) * 200);
         strcpy(m_url_real, "/html/fans.html");
@@ -576,14 +577,14 @@ http_conn::HTTP_CODE http_conn::do_request()
 
         free(m_url_real);
     }
-    else if(*(p + 1) == '8'){
+    else if(*(p + 1) == '8'&& *(p+2) == '\0'){
         char *m_url_real = (char*)malloc(sizeof(char)*200);
         strcpy(m_url_real,"/html/upload.html");
         strncpy(m_real_file + len,m_url_real,strlen(m_url_real));
         free(m_url_real);
     }
     //文件上传功能实现
-    else if(*(p + 1) == '9'){
+    else if(*(p + 1) == '9' && *(p+2) == '\0'){
         if(m_method == POST && m_content_length != 0){
             
             std::string path(Config::websiteRoot.c_str());
@@ -667,11 +668,15 @@ http_conn::HTTP_CODE http_conn::do_request()
     //处理下载请求
         return FILE_DOWNLOAD;
     }
-    else{
-       
-        strncpy(m_real_file + len, m_request_url, FILENAME_LEN - len - 1);   
+    else if(strcasecmp(p,"/index.html") == 0){
+        strcat(m_real_file,"/index.html");
     }
-
+    else{
+        std::string src = "/src";
+        strcat(m_real_file,src.c_str());
+        len += src.length();
+        strncpy(m_real_file + len, p, FILENAME_LEN - len - 1);   
+    }
     //stat() 用于获取文件的属性存储在stat结构体里面
     if (stat(m_real_file, &m_file_stat) < 0){
         //cout<<"break point"<<endl;
@@ -679,17 +684,18 @@ http_conn::HTTP_CODE http_conn::do_request()
         //cout<<m_real_file<<endl;
         return NO_RESOURCE;
     }
-
+    
     if (!(m_file_stat.st_mode & S_IROTH))
         return FORBIDDEN_REQUEST;
 
     if (S_ISDIR(m_file_stat.st_mode))
         return BAD_REQUEST;
-
+    
     int fd = open(m_real_file, O_RDONLY);
     //mmap() 将文件映射到内存中提高响应速度
     m_file_address = (char *)mmap(0, m_file_stat.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
     close(fd);
+    
     return FILE_REQUEST;
 }
 void http_conn::unmap()
@@ -913,6 +919,13 @@ bool http_conn::process_write(HTTP_CODE ret)
                     return false;
                 }
             }
+            break;
+        }
+        case NO_RESOURCE:{
+            add_status_line(404, error_404_title);
+            add_headers(strlen(error_404_form));
+            if (!add_content(error_404_form))
+                return false;
             break;
         }
         default:
