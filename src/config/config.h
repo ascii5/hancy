@@ -19,6 +19,7 @@ public:
 
     //日志写入方式
     static int LOGWrite;
+    static int logLevel;
 
     //触发组合模式
     static int TRIGMode;

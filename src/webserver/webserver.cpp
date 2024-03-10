@@ -24,6 +24,7 @@ WebServer::WebServer()
     m_TRIGMode = Config::TRIGMode;
     m_close_log = Config::close_log;
     m_actormodel = Config::actor_model;
+    logLevel = Config::logLevel;
 }
 
 WebServer::~WebServer()
@@ -39,7 +40,6 @@ WebServer::~WebServer()
 
 void WebServer::WebServerPrepare(){
     this -> log_write();
-    LOG_DEBUG("%d",m_log_write);
     this -> sql_pool();
     this -> thread_pool();
     this -> trig_mode();
@@ -81,9 +81,9 @@ void WebServer::log_write()
         //初始化日志
         //m_log_write == 1 为异步模式
         if (1 == m_log_write)
-            Log::get_instance()->init("./ServerLog", m_close_log, 2000, 800000, 800);
+            Log::get_instance()->init("./ServerLog", m_close_log, 2000, 800000, 800,logLevel);
         else
-            Log::get_instance()->init("./ServerLog", m_close_log, 2000, 800000, 0);
+            Log::get_instance()->init("./ServerLog", m_close_log, 2000, 800000, 0,logLevel);
     }
 }
 

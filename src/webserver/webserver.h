@@ -77,5 +77,9 @@ private:
     //定时器相关
     client_data *users_timer;
     Utils utils;
+
+
+    //日志相关
+    int logLevel;
 };
 #endif

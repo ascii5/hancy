@@ -23,8 +23,10 @@ Log::~Log()
 }
 //init() 创建文件，创建异步写线程(max_queue_size >= 1)
 //异步需要设置阻塞队列的长度，同步不需要设置
-bool Log::init(const char *file_name, int close_log, int log_buf_size, int split_lines, int max_queue_size)
+bool Log::init(const char *file_name, int close_log, int log_buf_size, int split_lines, int max_queue_size,int logLevel)
 {
+
+    log_level = logLevel;
     //如果设置了max_queue_size,则设置为异步
     if (max_queue_size >= 1)
     {

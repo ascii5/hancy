@@ -17,6 +17,7 @@ int Config::sql_num = 8;
 int Config::thread_num = 8;
 //关闭日志,默认不关闭
 int Config::close_log = 0;
+int Config::logLevel = 2;
 //并发模型,默认是proactor
 int Config::actor_model = 0;
 //需要修改的数据库信息,登录名,密码,库名
