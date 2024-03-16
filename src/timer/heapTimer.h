@@ -122,6 +122,18 @@ public:
     int m_TIMESLOT;
 };
 
+class timerManager{
+public:
+    void add_timer(util_timer* timer);
+    void timer_handler();
+    void adjust_timer(util_timer *timer);
+    void deal_timer(util_timer *timer, int sockfd,client_data* users_timer);
+private:
+    heapTimer m_heapTimer;
+    int m_TIMESLOT;
+    int m_close_log = 0;
+};
+
 void cb_func(client_data *user_data);
 
 #endif

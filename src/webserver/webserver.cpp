@@ -197,34 +197,13 @@ void WebServer::timer(int connfd, struct sockaddr_in client_address)
     timer->expire = cur + 3 * TIMESLOT;
     timer->id = connfd;
     users_timer[connfd].timer = timer;
-    utils.u_heapTimer.addTimer(timer);
+    m_timer_manager.add_timer(timer);
 
     //delete timer;
 }
 
 //若有数据传输，则将定时器往后延迟3个单位
 //并对新的定时器在链表上的位置进行调整
-void WebServer::adjust_timer(util_timer *timer)
-{
-    time_t cur = time(NULL);
-    timer->expire = cur + 3 * TIMESLOT;
-    utils.u_heapTimer.adjust(timer);
-
-    LOG_INFO("%s", "adjust timer once");
-}
-
-void WebServer::deal_timer(util_timer *timer, int sockfd)
-{
-    //cb_func() 从epoll中删除对应的sockfd, 并且关闭sockfd
-    timer->cb_func(&users_timer[sockfd]);
-    if (timer)
-    {
-        utils.u_heapTimer.delTimer(timer);
-    }
-
-    LOG_INFO("close fd %d", users_timer[sockfd].sockfd);
-}
-
 bool WebServer::dealclinetdata()
 {
     struct sockaddr_in client_address;
@@ -317,7 +296,7 @@ void WebServer::dealwithread(int sockfd)
         if (timer)
         {
             //将定时器往后延迟三个单位(TIMESLOT)
-            adjust_timer(timer);
+            m_timer_manager.adjust_timer(timer);
         }
 
         //若监测到读事件，将该事件放入请求队列
@@ -331,7 +310,7 @@ void WebServer::dealwithread(int sockfd)
                 if (1 == users[sockfd].timer_flag)
                 {
                     //关闭连接，删除timer
-                    deal_timer(timer, sockfd);
+                    m_timer_manager.deal_timer(timer, sockfd,users_timer);
                     users[sockfd].timer_flag = 0;
                 }
                 users[sockfd].is_processed = 0;
@@ -352,12 +331,12 @@ void WebServer::dealwithread(int sockfd)
 
             if (timer)
             {
-                adjust_timer(timer);
+                m_timer_manager.adjust_timer(timer);
             }
         }
         else
         {
-            deal_timer(timer, sockfd);
+            m_timer_manager.deal_timer(timer, sockfd,users_timer);
             //dealtime() 删除定时器，sockfd(关闭)
         }
     }
@@ -371,7 +350,7 @@ void WebServer::dealwithwrite(int sockfd)
     {
         if (timer)
         {
-            adjust_timer(timer);
+            m_timer_manager.adjust_timer(timer);
         }
 
         m_pool->append(users + sockfd, 1);
@@ -382,7 +361,7 @@ void WebServer::dealwithwrite(int sockfd)
             {
                 if (1 == users[sockfd].timer_flag)
                 {
-                    deal_timer(timer, sockfd);
+                    m_timer_manager.deal_timer(timer, sockfd,users_timer);
                     users[sockfd].timer_flag = 0;
                 }
                 users[sockfd].is_processed = 0;
@@ -399,12 +378,12 @@ void WebServer::dealwithwrite(int sockfd)
 
             if (timer)
             {
-                adjust_timer(timer);
+                m_timer_manager.adjust_timer(timer);
             }
         }
         else
         {
-            deal_timer(timer, sockfd);
+            m_timer_manager.deal_timer(timer, sockfd,users_timer);
         }
     }
 }
@@ -446,7 +425,7 @@ void WebServer::eventLoop()
                 //服务器端关闭连接，移除对应的定时器
                 //epoll中删除对应的sockfd,关闭对应的sockfd
                 util_timer *timer = users_timer[sockfd].timer;
-                deal_timer(timer, sockfd);
+                m_timer_manager.deal_timer(timer, sockfd,users_timer);
             }
             //处理信号(m_pipefd[0] 存在数据可读)
             //SIG_ALARM 为 timeout = true
@@ -471,7 +450,7 @@ void WebServer::eventLoop()
         if (timeout)
         {
             //调用tick清理函数，清理链表上的过期连接
-            utils.timer_handler();
+            m_timer_manager.timer_handler();
 
             LOG_INFO("%s", "timer tick");
 

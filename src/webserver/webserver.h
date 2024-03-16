@@ -36,8 +36,6 @@ private:
     void eventListen();
 
     void timer(int connfd, struct sockaddr_in client_address);
-    void adjust_timer(util_timer *timer);
-    void deal_timer(util_timer *timer, int sockfd);
     bool dealclinetdata();
     bool dealwithsignal(bool& timeout, bool& stop_server);
     void dealwithread(int sockfd);
@@ -77,7 +75,7 @@ private:
     //定时器相关
     client_data *users_timer;
     Utils utils;
-
+    timerManager m_timer_manager;
 
     //日志相关
     int logLevel;

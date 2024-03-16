@@ -1,13 +1,13 @@
 #include "heapTimer.h"
 
 void heapTimer::delTimer(util_timer* timer){
-    assert(ref_.count(timer -> id) > 0);
+    //assert(ref_.count(timer -> id) > 0);
     int index = ref_[timer -> id];
     del_(index);
 }
 
 void heapTimer::printTimerExpire(){
-    assert(!heap_.empty());
+    //assert(!heap_.empty());
     std::time_t timeNow = std::time(nullptr);
 
     while(!heap_.empty()){
@@ -57,11 +57,11 @@ void heapTimer::doWork(int id){
 }
 
 void heapTimer::del_(size_t i){
-    assert(!heap_.empty());
+    //assert(!heap_.empty());
     if(i < 0 || i > heap_.size()){
         std::cout<<"del_ error"<<i<<std::endl;
     }
-    assert(i >= 0 && i < heap_.size());
+    //assert(i >= 0 && i < heap_.size());
     
     int j = heap_.size() - 1;
     
@@ -77,7 +77,7 @@ void heapTimer::del_(size_t i){
 }
 
 void heapTimer::pop(){
-    assert(!heap_.empty());
+    //assert(!heap_.empty());
     del_(0);
 }
 
@@ -94,7 +94,7 @@ void heapTimer::tick(){
 }
 
 bool heapTimer::shiftDown_(size_t index,int n){
-    assert(index >= 0 && index < n);
+    //assert(index >= 0 && index < n);
 
     int i = index;
     int j = i * 2 + 1;
@@ -111,8 +111,8 @@ bool heapTimer::shiftDown_(size_t index,int n){
 }
 
 void heapTimer::swapNode_(size_t i,size_t j){
-    assert(i >= 0 && i < heap_.size());
-    assert(j >= 0 && j < heap_.size());
+    //assert(i >= 0 && i < heap_.size());
+    //assert(j >= 0 && j < heap_.size());
     
     
     ref_[heap_[i].id] = j;
@@ -122,7 +122,7 @@ void heapTimer::swapNode_(size_t i,size_t j){
 }
 
 void heapTimer::shiftUp_(size_t i){
-    assert(i >= 0 && i < heap_.size());
+    //assert(i >= 0 && i < heap_.size());
     
     
     int j = (i - 1) / 2;
@@ -135,7 +135,7 @@ void heapTimer::shiftUp_(size_t i){
 }
 
 void heapTimer::addTimer(util_timer* timer){
-    assert(timer->id >= 0);
+    //assert(timer->id >= 0);
     
     
     size_t i;
@@ -240,4 +240,34 @@ void cb_func(client_data *user_data)
     assert(user_data);
     close(user_data->sockfd);
     http_conn::m_user_count--;
+}
+
+void timerManager::timer_handler(){
+    m_heapTimer.tick();
+    alarm(m_TIMESLOT);
+}
+
+void timerManager::adjust_timer(util_timer *timer)
+{
+    time_t cur = time(NULL);
+    timer->expire = cur + 3 * m_TIMESLOT;
+    m_heapTimer.adjust(timer);
+
+    LOG_INFO("%s", "adjust timer once");
+}
+
+void timerManager::deal_timer(util_timer *timer, int sockfd,client_data* users_timer)
+{
+    //cb_func() 从epoll中删除对应的sockfd, 并且关闭sockfd
+    timer->cb_func(&users_timer[sockfd]);
+    if (timer)
+    {
+        m_heapTimer.delTimer(timer);
+    }
+
+    LOG_INFO("close fd %d", users_timer[sockfd].sockfd);
+}
+
+void timerManager::add_timer(util_timer* timer){
+    m_heapTimer.addTimer(timer);
 }
