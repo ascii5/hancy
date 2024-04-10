@@ -20,8 +20,6 @@ public:
 public:
     void pAppend(std::string str);
     void printBuffer();
-    void clear();
-    void printAll();
 private:
     void hasWritten(size_t len);
     void ensureWriteAble(size_t len);
