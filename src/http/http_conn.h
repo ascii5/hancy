@@ -80,10 +80,14 @@ public:
 
 public:
     http_conn() {}
-    ~http_conn() {delete m_host;memset(m_real_file,'\0',sizeof(m_real_file));}
+    ~http_conn()
+    {
+        delete m_host;
+        memset(m_real_file, '\0', sizeof(m_real_file));
+    }
 
 public:
-    void init(int sockfd, const sockaddr_in &addr, char * root, int TRGIMode, int close_log, string user, string passwd, string sqlname);
+    void init(int sockfd, const sockaddr_in &addr, char *root, int TRGIMode, int close_log, string user, string passwd, string sqlname);
     void close_conn(bool real_close = true);
     void process();
     bool read_once();
@@ -93,9 +97,11 @@ public:
         return &m_address;
     }
     void initmysql_result(connection_pool *connPool);
+
 public:
     int timer_flag;
     int is_processed;
+
 private:
     void init();
     HTTP_CODE process_read();
@@ -116,11 +122,12 @@ private:
     bool add_linger();
     bool add_blank_line();
     void setHeaders();
+
 public:
     static int m_epollfd;
     static int m_user_count;
     MYSQL *mysql;
-    int m_state;  //读为0, 写为1
+    int m_state; // 读为0, 写为1
 
 private:
     int m_sockfd;
@@ -143,8 +150,8 @@ private:
     struct stat m_file_stat;
     struct iovec m_iv[2];
     int m_iv_count;
-    int cgi;        //是否启用的POST
-    char *m_content; //存储请求头数据
+    int cgi;         // 是否启用的POST
+    char *m_content; // 存储请求头数据
     int bytes_to_send;
     int bytes_have_send;
     char *m_website_root;
@@ -153,12 +160,12 @@ private:
     int m_TRIGMode;
     int m_close_log;
     std::string uploadFilePath;
-    int userId;   //0代表这公共
+    int userId; // 0代表这公共
     char sql_user[100];
     char sql_passwd[100];
     char sql_name[100];
 
-    std::map<std::string,std::string> m_headers;
+    std::map<std::string, std::string> m_headers;
 };
 
 #endif
