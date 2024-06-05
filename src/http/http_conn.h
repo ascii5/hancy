@@ -33,6 +33,7 @@
 #include "../timer/heapTimer.h"
 #include "../log/log.h"
 #include "../config/config.h"
+#include "../buffer/buffer.h"
 
 class http_conn
 {
@@ -71,17 +72,17 @@ public:
         FILE_UPLOAD,
         FILE_DOWNLOAD
     };
-    enum LINE_STATUS
-    {
-        LINE_OK = 0,
-        LINE_BAD,
-        LINE_OPEN
-    };
+    
+    
+   
 
 public:
-    http_conn() {}
+    http_conn() {
+        m_buff = new buffer(1024);
+    }
     ~http_conn()
     {
+        delete m_buff;
         delete m_host;
         memset(m_real_file, '\0', sizeof(m_real_file));
     }
@@ -91,6 +92,7 @@ public:
     void close_conn(bool real_close = true);
     void process();
     bool read_once();
+    bool read_once_buffer();
     bool write();
     sockaddr_in *get_address()
     {
@@ -111,7 +113,7 @@ private:
     HTTP_CODE parse_content(char *text);
     HTTP_CODE do_request();
     char *get_line() { return m_read_buf + m_start_line; };
-    LINE_STATUS parse_line();
+    // LINE_STATUS parse_line();
     void unmap();
     bool add_response(const char *format, ...);
     bool add_content(const char *content);
@@ -122,6 +124,8 @@ private:
     bool add_linger();
     bool add_blank_line();
     void setHeaders();
+    void test_do_request();
+    void test_buffer_parse();
 
 public:
     static int m_epollfd;
@@ -166,6 +170,7 @@ private:
     char sql_name[100];
 
     std::map<std::string, std::string> m_headers;
+    buffer* m_buff;
 };
 
 #endif

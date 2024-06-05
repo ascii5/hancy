@@ -322,7 +322,9 @@ void WebServer::dealwithread(int sockfd)
     {
         //模拟proactor 主线程负责io数据工作线程只负责工作逻辑
         //真 proactor 是操作系统io数据，工作线程只负责工作逻辑
-        if (users[sockfd].read_once())
+       
+        
+        if (users[sockfd].read_once_buffer())
         {
             LOG_INFO("deal with the client(%s)", inet_ntoa(users[sockfd].get_address()->sin_addr));
 

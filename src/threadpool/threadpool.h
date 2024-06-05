@@ -129,7 +129,7 @@ void threadpool<T>::run()
             //request 为http_conn类型
             if (0 == request->m_state)
             {
-                if (request->read_once())
+                if (request->read_once_buffer())
                 {
                     request->is_processed = 1;
                     //连接池初始化mysql连接(采用RAII方式在出作用域后自动释放资源)

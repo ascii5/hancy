@@ -187,38 +187,44 @@ void http_conn::init()
     memset(m_real_file, '\0', FILENAME_LEN);
 }
 
-// 从状态机，用于分析出一行内容
-// 返回值为行的读取状态，有LINE_OK,LINE_BAD,LINE_OPEN
-http_conn::LINE_STATUS http_conn::parse_line()
-{
-    char temp;
-    for (; m_checked_idx < m_read_idx; ++m_checked_idx)
+bool http_conn::read_once_buffer(){
+    int bytes_read = 0;
+
+    // LT读取数据
+    if (0 == m_TRIGMode)
     {
-        temp = m_read_buf[m_checked_idx];
-        if (temp == '\r')
+        bytes_read = m_buff->readFd(m_sockfd);
+        //bytes_read = recv(m_sockfd, m_read_buf + m_read_idx, READ_BUFFER_SIZE - m_read_idx, 0);
+        m_read_idx += bytes_read;
+        //m_buff->printBuffer();
+        if (bytes_read <= 0)
         {
-            if ((m_checked_idx + 1) == m_read_idx)
-                return LINE_OPEN;
-            else if (m_read_buf[m_checked_idx + 1] == '\n')
-            {
-                m_read_buf[m_checked_idx++] = '\0';
-                m_read_buf[m_checked_idx++] = '\0';
-                return LINE_OK;
-            }
-            return LINE_BAD;
+            return false;
         }
-        else if (temp == '\n')
-        {
-            if (m_checked_idx > 1 && m_read_buf[m_checked_idx - 1] == '\r')
-            {
-                m_read_buf[m_checked_idx - 1] = '\0';
-                m_read_buf[m_checked_idx++] = '\0';
-                return LINE_OK;
-            }
-            return LINE_BAD;
-        }
+
+        return true;
     }
-    return LINE_OPEN;
+    // ET读数据
+    else
+    {
+        while (true)
+        {
+            bytes_read = m_buff->readFd(m_sockfd);
+            //bytes_read = recv(m_sockfd, m_read_buf + m_read_idx, READ_BUFFER_SIZE - m_read_idx, 0);
+            if (bytes_read == -1)
+            {
+                if (errno == EAGAIN || errno == EWOULDBLOCK)
+                    break;
+                return false;
+            }
+            else if (bytes_read == 0)
+            {
+                return false;
+            }
+            m_read_idx += bytes_read;
+        }
+        return true;
+    }
 }
 
 // 循环读取客户数据，直到无数据可读或对方关闭连接
@@ -353,14 +359,16 @@ http_conn::HTTP_CODE http_conn::parse_headers(char *text)
 // 判断http请求是否被完整读入
 http_conn::HTTP_CODE http_conn::parse_content(char *text)
 {
-    if (m_read_idx >= (m_content_length + m_checked_idx))
-    {
+    // if (m_read_idx >= (m_content_length + m_checked_idx))
+    // {
         text[m_content_length] = '\0';
         // POST请求中最后为输入的用户名和密码
         m_content = text;
+        m_buff -> getLine();
+        //m_buff -> printBuffer();
         return GET_REQUEST;
-    }
-    return NO_REQUEST;
+    // }
+    // return NO_REQUEST;
 }
 
 http_conn::HTTP_CODE http_conn::process_read()
@@ -369,10 +377,18 @@ http_conn::HTTP_CODE http_conn::process_read()
     HTTP_CODE ret = NO_REQUEST;
     char *text = 0;
 
-    while ((m_check_state == CHECK_STATE_CONTENT && line_status == LINE_OK) || ((line_status = parse_line()) == LINE_OK))
+    while ((m_check_state == CHECK_STATE_CONTENT && line_status == LINE_OK) || ((line_status = m_buff->parseLine()) == LINE_OK))
     {
-        text = get_line();
-        m_start_line = m_checked_idx;
+        text = m_buff->getLine();
+        
+        // std::cout<<std::endl;
+        // std::cout<<std::endl;
+        // std::cout<<std::endl;
+
+        // std::cout<<text<<std::endl;
+        // std::cout<<m_check_state<<std::endl;
+        // m_buff -> printBuffer();
+        //m_start_line = m_checked_idx;
         // 打印行信息
         LOG_INFO("%s", text);
         switch (m_check_state)
@@ -692,6 +708,9 @@ bool http_conn::write()
     if (bytes_to_send == 0)
     {
         modfd(m_epollfd, m_sockfd, EPOLLIN, m_TRIGMode);
+        std::cout<<"++++++++++++++++++"<<std::endl;
+        m_buff -> printBuffer();
+        std::cout<<"epoll listening"<<std::endl;
         init();
         return true;
     }
@@ -699,7 +718,7 @@ bool http_conn::write()
     while (1)
     {
         // weitev() 顺序向m_sockfd写入数据(从缓冲区)
-        temp = writev(m_sockfd, m_iv, m_iv_count);
+        temp = m_buff->writeFd(m_sockfd);
 
         if (temp < 0)
         {
@@ -716,18 +735,18 @@ bool http_conn::write()
 
         bytes_have_send += temp;
         bytes_to_send -= temp;
-        // m_iv[0] 的数据已经发送完毕了
-        if (bytes_have_send >= m_iv[0].iov_len)
-        {
-            m_iv[0].iov_len = 0;
-            m_iv[1].iov_base = m_file_address + (bytes_have_send - m_write_idx);
-            m_iv[1].iov_len = bytes_to_send;
-        }
-        else
-        {
-            m_iv[0].iov_base = m_write_buf + bytes_have_send;
-            m_iv[0].iov_len = m_iv[0].iov_len - bytes_have_send;
-        }
+        // // m_iv[0] 的数据已经发送完毕了
+        // if (bytes_have_send >= m_iv[0].iov_len)
+        // {
+        //     m_iv[0].iov_len = 0;
+        //     m_iv[1].iov_base = m_file_address + (bytes_have_send - m_write_idx);
+        //     m_iv[1].iov_len = bytes_to_send;
+        // }
+        // else
+        // {
+        //     m_iv[0].iov_base = m_write_buf + bytes_have_send;
+        //     m_iv[0].iov_len = m_iv[0].iov_len - bytes_have_send;
+        // }
 
         if (bytes_to_send <= 0)
         {
@@ -747,25 +766,36 @@ bool http_conn::write()
         }
     }
 }
-bool http_conn::add_response(const char *format, ...)
-{
-    if (m_write_idx >= WRITE_BUFFER_SIZE)
-        return false;
-    va_list arg_list;
-    va_start(arg_list, format);
-    int len = vsnprintf(m_write_buf + m_write_idx, WRITE_BUFFER_SIZE - 1 - m_write_idx, format, arg_list);
-    if (len >= (WRITE_BUFFER_SIZE - 1 - m_write_idx))
-    {
-        va_end(arg_list);
-        return false;
-    }
-    m_write_idx += len;
-    va_end(arg_list);
 
-    LOG_INFO("request:%s", m_write_buf);
+// bool http_conn::add_response(const char *format, ...)
+// {
+//     if (m_write_idx >= WRITE_BUFFER_SIZE)
+//         return false;
+//     va_list arg_list;
+//     va_start(arg_list, format);
+//     int len = vsnprintf(m_write_buf + m_write_idx, WRITE_BUFFER_SIZE - 1 - m_write_idx, format, arg_list);
+//     if (len >= (WRITE_BUFFER_SIZE - 1 - m_write_idx))
+//     {
+//         va_end(arg_list);
+//         return false;
+//     }
+//     m_write_idx += len;
+//     va_end(arg_list);
 
+//     LOG_INFO("request:%s", m_write_buf);
+
+//     return true;
+// }
+
+bool http_conn::add_response(const char*format,...){
+    
+    va_list args;
+    va_start(args,format);
+    int len = m_buff->formatStringAppend(format,args);
+    va_end(args);
     return true;
 }
+
 bool http_conn::add_status_line(int status, const char *title)
 {
     return add_response("%s %d %s\r\n", "HTTP/1.1", status, title);
@@ -833,12 +863,16 @@ bool http_conn::process_write(HTTP_CODE ret)
         if (m_file_stat.st_size != 0)
         {
             add_headers(m_file_stat.st_size);
-            m_iv[0].iov_base = m_write_buf;
-            m_iv[0].iov_len = m_write_idx;
-            m_iv[1].iov_base = m_file_address;
-            m_iv[1].iov_len = m_file_stat.st_size;
-            m_iv_count = 2;
-            bytes_to_send = m_write_idx + m_file_stat.st_size;
+            m_buff->append(m_file_address,m_file_stat.st_size);
+            // m_iv[0].iov_base = m_write_buf;
+            // m_iv[0].iov_len = m_write_idx;
+            // m_iv[1].iov_base = m_file_address;
+            // m_iv[1].iov_len = m_file_stat.st_size;
+            // m_iv_count = 2;
+            // bytes_to_send = m_write_idx + m_file_stat.st_size;
+            bytes_to_send = m_buff -> readable();
+            //m_buff -> printBuffer();
+            //std::cout<<"bytes_to_send: "<<bytes_to_send<<std::endl;
             return true;
         }
         else
@@ -918,27 +952,47 @@ bool http_conn::process_write(HTTP_CODE ret)
     m_iv[0].iov_base = m_write_buf;
     m_iv[0].iov_len = m_write_idx;
     m_iv_count = 1;
-    bytes_to_send = m_write_idx;
+    bytes_to_send = m_buff->readable();
     return true;
 }
 
 void http_conn::process()
 {
     // process_read() 读取(从缓冲区)并判断请求页面(设置m_url)
-    HTTP_CODE read_ret = process_read();
+    
 
+    HTTP_CODE read_ret = process_read();
+    test_do_request();
+    
     if (read_ret == NO_REQUEST)
     {
         // 监听读事件
         modfd(m_epollfd, m_sockfd, EPOLLIN, m_TRIGMode);
         return;
     }
+    
     bool write_ret = process_write(read_ret);
-
+    
+    
+    //close_conn();
     if (!write_ret)
     {
         close_conn();
     }
     // 监听写事件
     modfd(m_epollfd, m_sockfd, EPOLLOUT, m_TRIGMode);
+}
+
+void http_conn::test_do_request(){
+    int fd = open("./test_do_request.txt",O_RDWR | O_CREAT | O_TRUNC,0644);
+    
+    if(fd == -1){
+        std::cout<<"open function error!"<<std::endl;
+    }
+
+    //std::cout<<fd<<std::endl;
+
+    m_buff->writeFd(fd);
+    
+    close(fd);
 }
